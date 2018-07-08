@@ -1,0 +1,4 @@
+#!/Users/vladislavsazonov/PycharmProjects/Circle_Table/venv/bin/python
+# EASY-INSTALL-SCRIPT: 'Horus==0.2rc1','horus'
+__requires__ = 'Horus==0.2rc1'
+__import__('pkg_resources').run_script('Horus==0.2rc1', 'horus')
