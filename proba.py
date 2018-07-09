@@ -1,9 +1,7 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-
 import sys
-from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QWidget, QLCDNumber, QSlider, QVBoxLayout, QApplication)
+from PyQt5.QtWidgets import (QWidget, QLabel, QLineEdit, QTextEdit, QGridLayout, QApplication)
 
 
 class Example(QWidget):
@@ -13,16 +11,25 @@ class Example(QWidget):
         self.initUI()
     
     def initUI(self):
-        lcd = QLCDNumber(self)
-        sld = QSlider(Qt.Horizontal, self)
-        vbox = QVBoxLayout()
-        vbox.addWidget(lcd)
-        vbox.addWidget(sld)
-        self.setLayout(vbox)
-        sld.valueChanged.connect(lcd.display)
+        titleigt  = QLabel('Угол поворотного стола')
+        author = QLabel('Количество шагов')
+        review = QLabel('Скорость вращения')
+        titleEdit = QLineEdit()
+        authorEdit = QLineEdit()
+        reviewEdit = QLineEdit()
+        grid = QGridLayout()
+        grid.setSpacing(10)
+        grid.addWidget(title, 1, 0)
+        grid.addWidget(titleEdit, 1, 1)
+        grid.addWidget(author, 2, 0)
+        grid.addWidget(authorEdit, 2, 1)
+        grid.addWidget(review, 3, 0)
+        grid.addWidget(reviewEdit, 3, 1)
         
-        self.setGeometry(300, 300, 250, 150)
-        self.setWindowTitle('Signal & slot')
+        self.setLayout(grid)
+        
+        self.setGeometry(300, 300, 350, 300)
+        self.setWindowTitle('Review')
         self.show()
 
 
