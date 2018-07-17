@@ -7,14 +7,22 @@
 # WARNING! All changes made in this file will be lost!
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import (QMainWindow, QAction, qApp, QWidget, QLabel, QLineEdit, QTextEdit, QGridLayout, QApplication, QHBoxLayout)
+import sys
 
-class Ui_MainWindow(object):
+class Ui_MainWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        
     def setupUi(self, MainWindow):
+        
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(500, 500)
         MainWindow.setMinimumSize(QtCore.QSize(500, 500))
         MainWindow.setMaximumSize(QtCore.QSize(500, 500))
-        MainWindow.setWindowOpacity(0.0)
+        #MainWindow.setWindowOpacity(0.0)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         MainWindow.setDocumentMode(False)
@@ -42,7 +50,7 @@ class Ui_MainWindow(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.label_3 = QtWidgets.QLabel(self.groupBox)
-        self.label_3.setGeometry(QtCore.QRect(10, 140, 131, 16))
+        self.label_3.setGeometry(QtCore.QRect(10, 140, 141, 20))
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
@@ -97,6 +105,7 @@ class Ui_MainWindow(object):
         self.pushButton.setGeometry(QtCore.QRect(100, 340, 121, 51))
         self.pushButton.setCheckable(False)
         self.pushButton.setObjectName("pushButton")
+        self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(320, 30, 181, 191))
         self.label_7.setSizeIncrement(QtCore.QSize(0, 0))
@@ -117,6 +126,21 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        exitAction = QAction(QIcon('exit.png'), '&Exit', self)
+        exitAction.setShortcut('Ctrl+Q')
+        exitAction.setStatusTip('Exit application')
+        exitAction.triggered.connect(qApp.quit)
+
+        self.statusBar()
+
+        menubar = self.menuBar()
+        fileMenu = menubar.addMenu('&File')
+        fileMenu.addAction(exitAction)
+
+        self.setGeometry(300, 300, 300, 200)
+        self.setWindowTitle('Menubar')
+        self.show()
+        self.show()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -134,4 +158,36 @@ class Ui_MainWindow(object):
         self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
         self.pushButton.setText(_translate("MainWindow", "Полетели !"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
+        
+class myWin(QtWidgets.QMainWindow):
+    def __init__(self, parent=None):
+        QtWidgets.QWidget.__init__(self, parent)
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
 
+if __name__=="__main__":
+    app = QApplication(sys.argv)
+    
+    
+    #window = QMainWindow()
+    #ss = myWin()
+    #window.show()
+    
+    ui = Ui_MainWindow()
+    #ui.setupUi(window)
+    #window.show()
+    sys.exit(app.exec_())
+    
+    
+    #app = QtWidgets.QApplication(sys.argv)
+    #myapp = myWin()
+    #myapp.show()
+    #sys.exit(app.exec_())
+
+#app = QApplication(sys.argv)
+#window = QtGui()
+#ui = Ui_MainWindow()
+#ui.setupUi(window)
+#QtCore.QObject.connect(ui.butQuit, QtCore.SIGNAL("clicked()"), QtGui.qApp.quit)
+#window.show()
+#sys.exit(app.exec_())
