@@ -15,6 +15,10 @@ class Ui_MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+    
+    def onChanged(self, text):
+        self.lineEdit.setText(text)
+        self.lineEdit.adjustSize()
         
     def setupUi(self, MainWindow):
         
@@ -42,6 +46,8 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit.setGeometry(QtCore.QRect(190, 60, 113, 20))
         self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit.textChanged[str].connect(self.onChanged)
+        #---
         self.label_2 = QtWidgets.QLabel(self.groupBox)
         self.label_2.setGeometry(QtCore.QRect(10, 100, 131, 16))
         font = QtGui.QFont()
@@ -54,6 +60,7 @@ class Ui_MainWindow(QMainWindow):
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
+        #print('sadsa')
         self.label_3.setFont(font)
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
@@ -62,6 +69,8 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setCurrentText("")
         self.comboBox.setMaxVisibleItems(12)
         self.comboBox.setObjectName("comboBox")
+        self.comboBox.addItems(["Ubuntu", "Mandriva", "Fedora", "Arch", "Gentoo"])
+        ## ---
         self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_2.setGeometry(QtCore.QRect(190, 100, 113, 20))
         self.lineEdit_2.setObjectName("lineEdit_2")
