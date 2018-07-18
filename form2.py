@@ -137,7 +137,7 @@ class Ui_MainWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         exitAction = QAction(QIcon('exit.png'), '&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Exit application')
+        exitAction.setStatusTip('Exit applicationsss')
         exitAction.triggered.connect(qApp.quit)
 
         self.statusBar()
@@ -148,6 +148,9 @@ class Ui_MainWindow(QMainWindow):
 
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('Круглый стол')
+
+        self.statusBar().showMessage('Ready')
+        
         self.show()
         self.show()
 
