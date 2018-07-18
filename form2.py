@@ -147,7 +147,7 @@ class Ui_MainWindow(QMainWindow):
         fileMenu.addAction(exitAction)
 
         self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle('Menubar')
+        self.setWindowTitle('Круглый стол')
         self.show()
         self.show()
 
