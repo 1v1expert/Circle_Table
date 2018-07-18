@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import sys, glob, time, serial, os, struct, subprocess, threading, struct
 
 std_speeds = ['1843200', '921600', '460800', '230400', '115200', '57600', '38400', '19200', '9600', '4800', '2400',
