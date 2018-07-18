@@ -10,6 +10,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QAction, qApp, QWidget, QLabel, QLineEdit, QTextEdit, QGridLayout, QApplication, QHBoxLayout)
 import sys
+import comscanner
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
@@ -19,6 +20,8 @@ class Ui_MainWindow(QMainWindow):
     def onChanged(self, text):
         self.lineEdit.setText(text)
         self.lineEdit.adjustSize()
+    def find_ports(self):
+        comscanner.find_ports()
         
     def setupUi(self, MainWindow):
         
@@ -114,7 +117,8 @@ class Ui_MainWindow(QMainWindow):
         self.pushButton.setGeometry(QtCore.QRect(100, 340, 121, 51))
         self.pushButton.setCheckable(False)
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        self.pushButton.clicked.connect(self.find_ports)
+        #self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
         self.label_7.setGeometry(QtCore.QRect(320, 30, 181, 191))
         self.label_7.setSizeIncrement(QtCore.QSize(0, 0))
@@ -137,13 +141,13 @@ class Ui_MainWindow(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         exitAction = QAction(QIcon('exit.png'), '&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
-        exitAction.setStatusTip('Exit applicationsss')
+        exitAction.setStatusTip('Завершение приложения')
         exitAction.triggered.connect(qApp.quit)
 
         self.statusBar()
 
         menubar = self.menuBar()
-        fileMenu = menubar.addMenu('&File')
+        fileMenu = menubar.addMenu('&Файл')
         fileMenu.addAction(exitAction)
 
         self.setGeometry(300, 300, 300, 200)
