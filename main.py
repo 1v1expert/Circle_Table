@@ -22,13 +22,24 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit.adjustSize()
     def find_ports(self):
         comscanner.find_ports()
+
+    def show_modal_window(self):
+        global modalWindow
+        # Часть 11. Создание оконных приложений
+        modalWindow = QWidget(self, QtCore.Qt.Window)
+        modalWindow.setWindowTitle("Moдaльнoe окно")
+        modalWindow.resize(100, 50)
+        # modalWindow.setWindowModality(QtCore.Qt.WindowModal)
+        modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        modalWindow.move(self.geometry().center() - modalWindow.rect().center() - QtCore.QPoint(100, 50))
+        modalWindow.show()
         
     def setupUi(self, MainWindow):
         
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(500, 500)
-        MainWindow.setMinimumSize(QtCore.QSize(500, 500))
-        MainWindow.setMaximumSize(QtCore.QSize(500, 500))
+        MainWindow.setMinimumSize(QtCore.QSize(550, 500))
+        MainWindow.setMaximumSize(QtCore.QSize(550, 500))
         #MainWindow.setWindowOpacity(0.0)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
@@ -36,7 +47,7 @@ class Ui_MainWindow(QMainWindow):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(0, 20, 311, 411))
+        self.groupBox.setGeometry(QtCore.QRect(10, 20, 311, 411))
         self.groupBox.setObjectName("groupBox")
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(10, 50, 111, 41))
@@ -49,7 +60,7 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit.setGeometry(QtCore.QRect(190, 60, 113, 20))
         self.lineEdit.setObjectName("lineEdit")
-        self.lineEdit.textChanged[str].connect(self.onChanged)
+        #self.lineEdit.textChanged[str].connect(self.onChanged)
         #---
         self.label_2 = QtWidgets.QLabel(self.groupBox)
         self.label_2.setGeometry(QtCore.QRect(10, 100, 131, 16))
@@ -117,10 +128,12 @@ class Ui_MainWindow(QMainWindow):
         self.pushButton.setGeometry(QtCore.QRect(100, 340, 121, 51))
         self.pushButton.setCheckable(False)
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(self.find_ports)
+        
+        self.pushButton.clicked.connect(self.show_modal_window)
+        #self.pushButton.clicked.connect(self.find_ports)
         #self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
-        self.label_7.setGeometry(QtCore.QRect(320, 30, 181, 191))
+        self.label_7.setGeometry(QtCore.QRect(360, 40, 181, 191))
         self.label_7.setSizeIncrement(QtCore.QSize(0, 0))
         self.label_7.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_7.setText("")
@@ -144,11 +157,18 @@ class Ui_MainWindow(QMainWindow):
         exitAction.setStatusTip('Завершение приложения')
         exitAction.triggered.connect(qApp.quit)
 
+        #exitAction2 = QAction(QIcon('exit2.png'), '&Exit', self)
+        #exitAction2.setShortcut('Ctrl+R')
+        #exitAction2.setStatusTip('Вызов настроек')
+        #exitAction2.triggered.connect(self.show_modal_window)
+
         self.statusBar()
 
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&Файл')
         fileMenu.addAction(exitAction)
+        #fileMenu.addAction(exitAction2)
+        
 
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('Круглый стол')
