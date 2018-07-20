@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'form2.ui'
+# Form implementation generated from reading ui file 'apps.form2.ui'
 #
-# Created by: PyQt5 UI code generator 5.11.2
+# Created by: VLADDOS
 #
-# WARNING! All changes made in this file will be lost!
+#
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon
@@ -22,13 +22,17 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit.adjustSize()
     def find_ports(self):
         comscanner.find_ports()
+    def Init_board(self):
+        comscanner.get_start()
 
     def show_modal_window(self):
         global modalWindow
         # Часть 11. Создание оконных приложений
         modalWindow = QWidget(self, QtCore.Qt.Window)
-        modalWindow.setWindowTitle("Moдaльнoe окно")
-        modalWindow.resize(100, 50)
+        modalWindow.setWindowTitle("Настройки")
+        modalWindow.resize(300, 150)
+        modalWindow.setMinimumSize(QtCore.QSize(300, 150))
+        modalWindow.setMaximumSize(QtCore.QSize(300, 150))
         # modalWindow.setWindowModality(QtCore.Qt.WindowModal)
         modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         modalWindow.move(self.geometry().center() - modalWindow.rect().center() - QtCore.QPoint(100, 50))
@@ -124,12 +128,21 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit_4 = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_4.setGeometry(QtCore.QRect(190, 190, 113, 20))
         self.lineEdit_4.setObjectName("lineEdit_4")
+
+        self.pushButton2 = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton2.setGeometry(QtCore.QRect(150, 340, 121, 51))
+        self.pushButton2.setCheckable(False)
+        self.pushButton2.setObjectName("pushButton2")
+        
         self.pushButton = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton.setGeometry(QtCore.QRect(100, 340, 121, 51))
+        self.pushButton.setGeometry(QtCore.QRect(30, 340, 121, 51))
         self.pushButton.setCheckable(False)
         self.pushButton.setObjectName("pushButton")
         
-        self.pushButton.clicked.connect(self.show_modal_window)
+        #----- MAin button
+        self.pushButton.clicked.connect(self.Init_board)
+        #self.pushButton.clicked.connect(self.show_modal_window)
+        self.pushButton2.clicked.connect(self.show_modal_window)
         #self.pushButton.clicked.connect(self.find_ports)
         #self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
@@ -194,6 +207,9 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
         self.pushButton.setText(_translate("MainWindow", "Полетели !"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
+
+        self.pushButton2.setText(_translate("MainWindow", "Настройки"))
+        self.pushButton2.setShortcut(_translate("MainWindow", "Return"))
         
 class myWin(QtWidgets.QMainWindow):
     def __init__(self, parent=None):

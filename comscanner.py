@@ -12,7 +12,8 @@ reading_bytes = 10  # Количество байт для чтения посл
 keyword = b'\x00\x00\x00'  # !Сигнатура для поиска
 cmd = b'\x00\x34\x65'  # !Команда перед началом приема
 ser = serial.Serial()
-
+import logging
+logger = logging.getLogger(__name__)
 
 ################# Поиск доступных портов windows, linux, cygwin, darwin
 def serial_ports():
@@ -24,6 +25,7 @@ def serial_ports():
     elif sys.platform.startswith('darwin'):
         ports = glob.glob('/dev/tty.*')
     else:
+        print('Unsupported platform')
         raise EnvironmentError('Unsupported platform')
     
     result = []
@@ -55,6 +57,7 @@ def find_ports():
     print(keyword)
 
     ports = serial_ports()
+    print('PORTS - ', ports)
     if ports:
         print('Доступные порты:')
         print(ports)
@@ -116,3 +119,78 @@ def find_ports():
         sys.exit()
 
     sys.exit()
+    
+def start_platform():
+    cmd_init = "M17"
+    cmd = "G1X-10"
+    t_out = 1
+    bite_size = 8
+    ports = serial_ports()
+    print('PORTS - ', ports)
+
+    ser = serial.Serial()
+    ser.port = input('Введите адрес COM порта ')
+    
+    ser.close()
+    ser.baudrate = '115200'
+    #ser.timeout = t_out
+    #ser.bytesize = bite_size
+    ser.open()
+    print(cmd)
+    ser.write(cmd_init.encode('utf-8'))
+    message_b = ser.read(reading_bytes)
+    print(message_b)
+    time.sleep(1)
+    ser.write(cmd.encode('utf-8'))
+    message_b = ser.read(reading_bytes)
+    print(message_b)
+    ser.close()
+
+def get_start(serial_name = '/dev/tty.wchusbserial1410', baud_rate = '115200'):
+    serial_port = serial.Serial(serial_name, baud_rate, timeout=2)
+    is_connected = False
+    def motor_reset_origin():
+        _send_command("G50")
+    def _send_command(req):
+        ret = ''
+        read_lines = False
+        serial_port.flushInput()
+        serial_port.flushOutput()
+        serial_port.write(req.encode('utf-8') + "\r\n".encode('utf-8'))
+        while req != '~' and req != '!' and ret == '':
+            ret = serial_port.read(read_lines)
+            time.sleep(0.01)
+            print(ret)
+        print('Vax')
+    def OldFirmware():
+        print('Old Firmware')
+    def motor_speed(value):
+        motor_speed = value
+        _send_command("G1F{0}".format(value))
+        
+    def reset():
+        serial_port.flushInput()
+        serial_port.flushOutput()
+        cmd = "\x18\r\n"
+        serial_port.write(cmd.encode('utf-8'))  # Ctrl-x
+        serial_port.readline()
+        
+    if serial_port.isOpen():
+        print('Port open')
+        reset()
+        version = serial_port.readline()
+        if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
+            raise OldFirmware()
+        elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
+            motor_speed(100)
+            serial_port.timeout = 0.05
+            is_connected = True
+            motor_reset_origin()
+            logger.info(" Done")
+            _send_command("G1X150")
+        serial_port.close()
+    else: print('Port closed')
+
+if __name__=='__main__':
+    get_start()
+    #start_platform()
