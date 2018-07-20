@@ -27,13 +27,21 @@ class Ui_MainWindow(QMainWindow):
 
     def show_modal_window(self):
         global modalWindow
-        # Часть 11. Создание оконных приложений
+        # Parts 11.
         modalWindow = QWidget(self, QtCore.Qt.Window)
         modalWindow.setWindowTitle("Настройки")
         modalWindow.resize(300, 150)
         modalWindow.setMinimumSize(QtCore.QSize(300, 150))
         modalWindow.setMaximumSize(QtCore.QSize(300, 150))
         # modalWindow.setWindowModality(QtCore.Qt.WindowModal)
+        #-- central widget
+        centralwidget = QtWidgets.QWidget(modalWindow)
+        centralwidget.setObjectName("centralwidget")
+        #-- group box
+        groupBox = QtWidgets.QGroupBox(centralwidget)
+        groupBox.setGeometry(QtCore.QRect(5, 10, 290, 130))
+        groupBox.setObjectName("groupBox")
+        
         modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         modalWindow.move(self.geometry().center() - modalWindow.rect().center() - QtCore.QPoint(100, 50))
         modalWindow.show()
@@ -61,9 +69,21 @@ class Ui_MainWindow(QMainWindow):
         self.label.setFont(font)
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
-        self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit.setGeometry(QtCore.QRect(190, 60, 113, 20))
-        self.lineEdit.setObjectName("lineEdit")
+
+        self.spinBox = QtWidgets.QSpinBox(self.groupBox)
+        self.spinBox.setRange(0, 100)
+        self.spinBox.setValue(10)
+        self.spinBox.setSingleStep(5)
+        #self.spinBox.setPrefix("текст до (")
+        self.spinBox.setSuffix(" градусов")
+        self.spinBox.setGeometry(QtCore.QRect(190, 60, 113, 20))
+        #self.spinBox.valueChanged[int].connect(on_value_changed1)
+        #self.spinBox.valueChanged[str].connect(on_value_changed2)
+        
+        #self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
+        #self.lineEdit.setGeometry(QtCore.QRect(190, 60, 113, 20))
+        #self.lineEdit.setObjectName("lineEdit")
+        
         #self.lineEdit.textChanged[str].connect(self.onChanged)
         #---
         self.label_2 = QtWidgets.QLabel(self.groupBox)
@@ -87,7 +107,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox.setCurrentText("")
         self.comboBox.setMaxVisibleItems(12)
         self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItems(["Ubuntu", "Mandriva", "Fedora", "Arch", "Gentoo"])
+        self.comboBox.addItems(["Медленная", "Средняя", "Высокая"])
         ## ---
         self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_2.setGeometry(QtCore.QRect(190, 100, 113, 20))
@@ -122,6 +142,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_2.setCurrentText("")
         self.comboBox_2.setMaxVisibleItems(12)
         self.comboBox_2.setObjectName("comboBox_2")
+        self.comboBox_2.addItems(["Прямо", "Инверс"])
         self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_3.setGeometry(QtCore.QRect(190, 240, 113, 20))
         self.lineEdit_3.setObjectName("lineEdit_3")
@@ -189,14 +210,14 @@ class Ui_MainWindow(QMainWindow):
         self.statusBar().showMessage('Ready')
         
         self.show()
-        self.show()
+
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Круглый стол"))
         self.groupBox.setTitle(_translate("MainWindow", "Управление"))
-        self.label.setText(_translate("MainWindow", "Угол поворотного стол:"))
-        self.lineEdit.setInputMask(_translate("MainWindow", "99999"))
+        self.label.setText(_translate("MainWindow", "Шаг (°)"))
+        #self.lineEdit.setInputMask(_translate("MainWindow", "99999"))
         self.label_2.setText(_translate("MainWindow", "Количество шагов:"))
         self.label_3.setText(_translate("MainWindow", "Скорость вращения:"))
         self.lineEdit_2.setInputMask(_translate("MainWindow", "99999"))
