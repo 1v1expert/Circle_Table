@@ -12,6 +12,7 @@ from PyQt5.QtWidgets import (QMainWindow, QAction, qApp, QWidget, QLabel, QLineE
 import sys
 import comscanner
 import board
+import time
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
@@ -19,8 +20,10 @@ class Ui_MainWindow(QMainWindow):
         self.setupUi(self)
         self.board = board.Board()
         self.board.serial_name = self.board.get_serial_list()[0]
-        self.is_connect = False
-
+        #self.is_connect = False
+        self.steps = 1
+        
+        
     def motor_invert(self, choos):
         if choos == 'Инверс':
             self.board.motor_invert(True)
@@ -43,8 +46,14 @@ class Ui_MainWindow(QMainWindow):
     def onConnectBoard(self):
         self.modalWindow.close()
         self.board.connect()
-    
-
+        
+    def Rotate(self):
+        if self.board._is_connected:
+            self.board.motor_move(step=self.steps)
+        else:
+            self.statusBar().showMessage('Ошибка! Нет подключения')
+            self.show_modal_window()
+            
     def show_modal_window(self):
         global modalWindow
         _translate = QtCore.QCoreApplication.translate
@@ -197,13 +206,31 @@ class Ui_MainWindow(QMainWindow):
         self.motor_invers_comboBox.setObjectName("comboBox_2")
         self.motor_invers_comboBox.addItems(["Прямо", "Инверс"])
         self.motor_invers_comboBox.activated[str].connect(self.motor_invert)
+
+        self.Delay_between_turns = QtWidgets.QSpinBox(self.groupBox)
+        self.Delay_between_turns.setRange(0, 1000)
+        self.Delay_between_turns.setValue(1)
+        self.Delay_between_turns.setSingleStep(10)
+        # self.spinBox.setPrefix("текст до (")
+        self.Delay_between_turns.setSuffix(" c")
+        self.Delay_between_turns.setGeometry(QtCore.QRect(190, 240, 113, 20))
+
+        self.Delay_before_start = QtWidgets.QSpinBox(self.groupBox)
+        self.Delay_before_start.setRange(0, 1000)
+        self.Delay_before_start.setValue(1)
+        self.Delay_before_start.setSingleStep(10)
+        # self.spinBox.setPrefix("текст до (")
+        self.Delay_before_start.setSuffix(" c")
+        self.Delay_before_start.setGeometry(QtCore.QRect(190, 190, 113, 20))
+        #self.Delay_before_start.setGeometry(QtCore.QRect(190, 240, 113, 20))
         
-        self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit_3.setGeometry(QtCore.QRect(190, 240, 113, 20))
-        self.lineEdit_3.setObjectName("lineEdit_3")
-        self.lineEdit_4 = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit_4.setGeometry(QtCore.QRect(190, 190, 113, 20))
-        self.lineEdit_4.setObjectName("lineEdit_4")
+        #self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
+        #self.lineEdit_3.setGeometry(QtCore.QRect(190, 240, 113, 20))
+        #self.lineEdit_3.setObjectName("lineEdit_3")
+        
+        #self.lineEdit_4 = QtWidgets.QLineEdit(self.groupBox)
+        #self.lineEdit_4.setGeometry(QtCore.QRect(190, 190, 113, 20))
+        #self.lineEdit_4.setObjectName("lineEdit_4")
 
         self.OpenSettings = QtWidgets.QPushButton(self.groupBox)
         self.OpenSettings.setGeometry(QtCore.QRect(150, 340, 121, 51))
@@ -216,7 +243,8 @@ class Ui_MainWindow(QMainWindow):
         self.pushButton.setObjectName("pushButton")
         
         #----- MAin button
-        self.pushButton.clicked.connect(self.Init_board)
+        self.pushButton.clicked.connect(self.Rotate)
+        #self.pushButton.clicked.connect(self.Init_board)
         #self.pushButton.clicked.connect(self.show_modal_window)
         self.OpenSettings.clicked.connect(self.show_modal_window)
         #self.pushButton.clicked.connect(self.find_ports)
@@ -279,8 +307,8 @@ class Ui_MainWindow(QMainWindow):
         self.label_4.setText(_translate("MainWindow", "Задержка перед стартом:"))
         self.label_5.setText(_translate("MainWindow", "Задержка между поворотами:"))
         self.label_6.setText(_translate("MainWindow", "Направление вращения:"))
-        self.lineEdit_3.setInputMask(_translate("MainWindow", "99999"))
-        self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
+        #self.lineEdit_3.setInputMask(_translate("MainWindow", "99999"))
+        #self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
         self.pushButton.setText(_translate("MainWindow", "Полетели !"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
 
