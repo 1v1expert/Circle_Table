@@ -20,12 +20,20 @@ class Ui_MainWindow(QMainWindow):
         self.board = board.Board()
         self.board.serial_name = self.board.get_serial_list()[0]
         self.is_connect = False
-    
+
+    def motor_invert(self, choos):
+        if choos == 'Инверс':
+            self.board.motor_invert(True)
+        else:
+            self.board.motor_invert(False)
+        
     def onChanged(self, text):
         self.lineEdit.setText(text)
         self.lineEdit.adjustSize()
+        
     def find_ports(self):
         comscanner.find_ports()
+        
     def Init_board(self):
         comscanner.get_start()
 
@@ -33,49 +41,51 @@ class Ui_MainWindow(QMainWindow):
         self.board.serial_name = serial_name
     
     def onConnectBoard(self):
+        self.modalWindow.close()
         self.board.connect()
+    
 
     def show_modal_window(self):
         global modalWindow
         _translate = QtCore.QCoreApplication.translate
         # Parts 11.
-        modalWindow = QWidget(self, QtCore.Qt.Window)
-        modalWindow.setWindowTitle("Настройки")
-        modalWindow.resize(300, 150)
-        modalWindow.setMinimumSize(QtCore.QSize(300, 150))
-        modalWindow.setMaximumSize(QtCore.QSize(300, 150))
+        self.modalWindow = QWidget(self, QtCore.Qt.Window)
+        self.modalWindow.setWindowTitle("Настройки")
+        self.modalWindow.resize(300, 150)
+        self.modalWindow.setMinimumSize(QtCore.QSize(300, 150))
+        self.modalWindow.setMaximumSize(QtCore.QSize(300, 150))
         # modalWindow.setWindowModality(QtCore.Qt.WindowModal)
         #-- central widget
-        centralwidget = QtWidgets.QWidget(modalWindow)
-        centralwidget.setObjectName("centralwidget")
+        self.centralwidget = QtWidgets.QWidget(self.modalWindow)
+        self.centralwidget.setObjectName("centralwidget")
         #-- group box
-        groupBox = QtWidgets.QGroupBox(centralwidget)
-        groupBox.setGeometry(QtCore.QRect(5, 10, 290, 130))
-        groupBox.setObjectName("groupBox")
-        groupBox.setTitle(_translate("MainWindow", "Настройка подключения"))
+        self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
+        self.groupBox.setGeometry(QtCore.QRect(5, 10, 290, 130))
+        self.groupBox.setObjectName("groupBox")
+        self.groupBox.setTitle(_translate("MainWindow", "Настройка подключения"))
 
-        comboBox_SerialPorts = QtWidgets.QComboBox(groupBox)
-        comboBox_SerialPorts.setGeometry(QtCore.QRect(5, 25, 231, 22))
-        comboBox_SerialPorts.setCurrentText("")
-        comboBox_SerialPorts.setMaxVisibleItems(12)
-        comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
-        comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        self.comboBox_SerialPorts = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_SerialPorts.setGeometry(QtCore.QRect(5, 25, 231, 22))
+        self.comboBox_SerialPorts.setCurrentText("")
+        self.comboBox_SerialPorts.setMaxVisibleItems(12)
+        self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
+        self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
 
-        comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
+        self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
-        ConnectButton = QtWidgets.QPushButton(groupBox)
-        ConnectButton.setGeometry(QtCore.QRect(20, 80, 221, 51))
-        ConnectButton.setCheckable(False)
-        ConnectButton.setObjectName("pushButton")
+        self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
+        self.ConnectButton.setGeometry(QtCore.QRect(20, 80, 221, 51))
+        self.ConnectButton.setCheckable(False)
+        self.ConnectButton.setObjectName("pushButton")
         
-        ConnectButton.setText(_translate("MainWindow", "подключить"))
-        ConnectButton.clicked.connect(self.onConnectBoard)
+        self.ConnectButton.setText(_translate("MainWindow", "подключить"))
+        self.ConnectButton.clicked.connect(self.onConnectBoard)
         
         #self.statusBar().showMessage('подключено')
         
-        modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
-        modalWindow.move(self.geometry().center() - modalWindow.rect().center() - QtCore.QPoint(100, 50))
-        modalWindow.show()
+        self.modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        self.modalWindow.move(self.geometry().center() - self.modalWindow.rect().center() - QtCore.QPoint(100, 50))
+        self.modalWindow.show()
         
     def setupUi(self, MainWindow):
         
@@ -89,6 +99,7 @@ class Ui_MainWindow(QMainWindow):
         MainWindow.setDocumentMode(False)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+        
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(10, 20, 311, 411))
         self.groupBox.setObjectName("groupBox")
@@ -178,12 +189,15 @@ class Ui_MainWindow(QMainWindow):
         self.label_6.setFont(font)
         self.label_6.setWordWrap(True)
         self.label_6.setObjectName("label_6")
-        self.comboBox_2 = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_2.setGeometry(QtCore.QRect(190, 280, 111, 22))
-        self.comboBox_2.setCurrentText("")
-        self.comboBox_2.setMaxVisibleItems(12)
-        self.comboBox_2.setObjectName("comboBox_2")
-        self.comboBox_2.addItems(["Прямо", "Инверс"])
+        
+        self.motor_invers_comboBox = QtWidgets.QComboBox(self.groupBox)
+        self.motor_invers_comboBox.setGeometry(QtCore.QRect(190, 280, 111, 22))
+        self.motor_invers_comboBox.setCurrentText("")
+        self.motor_invers_comboBox.setMaxVisibleItems(12)
+        self.motor_invers_comboBox.setObjectName("comboBox_2")
+        self.motor_invers_comboBox.addItems(["Прямо", "Инверс"])
+        self.motor_invers_comboBox.activated[str].connect(self.motor_invert)
+        
         self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
         self.lineEdit_3.setGeometry(QtCore.QRect(190, 240, 113, 20))
         self.lineEdit_3.setObjectName("lineEdit_3")
@@ -191,10 +205,10 @@ class Ui_MainWindow(QMainWindow):
         self.lineEdit_4.setGeometry(QtCore.QRect(190, 190, 113, 20))
         self.lineEdit_4.setObjectName("lineEdit_4")
 
-        self.pushButton2 = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton2.setGeometry(QtCore.QRect(150, 340, 121, 51))
-        self.pushButton2.setCheckable(False)
-        self.pushButton2.setObjectName("pushButton2")
+        self.OpenSettings = QtWidgets.QPushButton(self.groupBox)
+        self.OpenSettings.setGeometry(QtCore.QRect(150, 340, 121, 51))
+        self.OpenSettings.setCheckable(False)
+        self.OpenSettings.setObjectName("OpenSettings")
         
         self.pushButton = QtWidgets.QPushButton(self.groupBox)
         self.pushButton.setGeometry(QtCore.QRect(30, 340, 121, 51))
@@ -204,11 +218,11 @@ class Ui_MainWindow(QMainWindow):
         #----- MAin button
         self.pushButton.clicked.connect(self.Init_board)
         #self.pushButton.clicked.connect(self.show_modal_window)
-        self.pushButton2.clicked.connect(self.show_modal_window)
+        self.OpenSettings.clicked.connect(self.show_modal_window)
         #self.pushButton.clicked.connect(self.find_ports)
         #self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
-        self.label_7.setGeometry(QtCore.QRect(360, 40, 181, 191))
+        self.label_7.setGeometry(QtCore.QRect(330, 40, 215, 390))
         self.label_7.setSizeIncrement(QtCore.QSize(0, 0))
         self.label_7.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_7.setText("")
@@ -270,8 +284,8 @@ class Ui_MainWindow(QMainWindow):
         self.pushButton.setText(_translate("MainWindow", "Полетели !"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
 
-        self.pushButton2.setText(_translate("MainWindow", "Настройки"))
-        self.pushButton2.setShortcut(_translate("MainWindow", "Return"))
+        self.OpenSettings.setText(_translate("MainWindow", "Настройки"))
+        self.OpenSettings.setShortcut(_translate("MainWindow", "Return"))
         
 class myWin(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
