@@ -9,6 +9,7 @@ import time
 import glob
 import threading
 import platform
+import serial
 
 import logging
 logger = logging.getLogger(__name__)
@@ -73,13 +74,13 @@ class Board(object):
         logger.info("Connecting board {0} {1}".format(self.serial_name, self.baud_rate))
         self._is_connected = False
         try:
-            #self._serial_port = serial.Serial(self.serial_name, self.baud_rate, timeout=2)
+            self._serial_port = serial.Serial(self.serial_name, self.baud_rate, timeout=2)
             if self._serial_port.isOpen():
                 self._reset()  # Force Reset and flush
                 version = self._serial_port.readline()
-                if "Horus 0.1 ['$' for help]" in version:
+                if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
                     raise OldFirmware()
-                elif "Horus 0.2 ['$' for help]" in version:
+                elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
                     self.motor_speed(1)
                     self._serial_port.timeout = 0.05
                     self._is_connected = True
@@ -197,12 +198,13 @@ class Board(object):
     def _send_command(self, req, callback=None, read_lines=False):
         """Sends the request and returns the response"""
         ret = ''
+        req = req.encode('utf-8')
         if self._is_connected and req != '':
             if self._serial_port is not None and self._serial_port.isOpen():
                 try:
                     self._serial_port.flushInput()
                     self._serial_port.flushOutput()
-                    self._serial_port.write(req + "\r\n")
+                    self._serial_port.write(req + "\r\n".encode('utf-8'))
                     while req != '~' and req != '!' and ret == '':
                         ret = self.read(read_lines)
                         time.sleep(0.01)
@@ -240,7 +242,7 @@ class Board(object):
     def _reset(self):
         self._serial_port.flushInput()
         self._serial_port.flushOutput()
-        self._serial_port.write("\x18\r\n")  # Ctrl-x
+        self._serial_port.write("\x18\r\n".encode('utf-8'))  # Ctrl-x
         self._serial_port.readline()
 
     def get_serial_list(self):

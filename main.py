@@ -18,6 +18,8 @@ class Ui_MainWindow(QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.board = board.Board()
+        self.board.serial_name = self.board.get_serial_list()[0]
+        self.is_connect = False
     
     def onChanged(self, text):
         self.lineEdit.setText(text)
@@ -27,8 +29,15 @@ class Ui_MainWindow(QMainWindow):
     def Init_board(self):
         comscanner.get_start()
 
+    def onSetSerial(self, serial_name):
+        self.board.serial_name = serial_name
+    
+    def onConnectBoard(self):
+        self.board.connect()
+
     def show_modal_window(self):
         global modalWindow
+        _translate = QtCore.QCoreApplication.translate
         # Parts 11.
         modalWindow = QWidget(self, QtCore.Qt.Window)
         modalWindow.setWindowTitle("Настройки")
@@ -43,22 +52,26 @@ class Ui_MainWindow(QMainWindow):
         groupBox = QtWidgets.QGroupBox(centralwidget)
         groupBox.setGeometry(QtCore.QRect(5, 10, 290, 130))
         groupBox.setObjectName("groupBox")
+        groupBox.setTitle(_translate("MainWindow", "Настройка подключения"))
 
         comboBox_SerialPorts = QtWidgets.QComboBox(groupBox)
-        comboBox_SerialPorts.setGeometry(QtCore.QRect(5, 5, 231, 22))
+        comboBox_SerialPorts.setGeometry(QtCore.QRect(5, 25, 231, 22))
         comboBox_SerialPorts.setCurrentText("")
         comboBox_SerialPorts.setMaxVisibleItems(12)
         comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
         comboBox_SerialPorts.addItems(self.board.get_serial_list())
 
-        pushButton = QtWidgets.QPushButton(groupBox)
-        pushButton.setGeometry(QtCore.QRect(20, 80, 221, 51))
-        pushButton.setCheckable(False)
-        pushButton.setObjectName("pushButton")
-        _translate = QtCore.QCoreApplication.translate
-        pushButton.setText(_translate("MainWindow", "подключить"))
+        comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
+
+        ConnectButton = QtWidgets.QPushButton(groupBox)
+        ConnectButton.setGeometry(QtCore.QRect(20, 80, 221, 51))
+        ConnectButton.setCheckable(False)
+        ConnectButton.setObjectName("pushButton")
         
-        self.statusBar().showMessage('подключено')
+        ConnectButton.setText(_translate("MainWindow", "подключить"))
+        ConnectButton.clicked.connect(self.onConnectBoard)
+        
+        #self.statusBar().showMessage('подключено')
         
         modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         modalWindow.move(self.geometry().center() - modalWindow.rect().center() - QtCore.QPoint(100, 50))
@@ -79,6 +92,7 @@ class Ui_MainWindow(QMainWindow):
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
         self.groupBox.setGeometry(QtCore.QRect(10, 20, 311, 411))
         self.groupBox.setObjectName("groupBox")
+        
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(10, 50, 111, 41))
         font = QtGui.QFont()
@@ -88,13 +102,13 @@ class Ui_MainWindow(QMainWindow):
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
 
-        self.spinBox = QtWidgets.QSpinBox(self.groupBox)
-        self.spinBox.setRange(0, 100)
-        self.spinBox.setValue(10)
-        self.spinBox.setSingleStep(5)
+        self.StepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
+        self.StepsSpinBox.setRange(0, 100)
+        self.StepsSpinBox.setValue(10)
+        self.StepsSpinBox.setSingleStep(5)
         #self.spinBox.setPrefix("текст до (")
-        self.spinBox.setSuffix(" градусов")
-        self.spinBox.setGeometry(QtCore.QRect(190, 60, 113, 20))
+        self.StepsSpinBox.setSuffix(" градусов")
+        self.StepsSpinBox.setGeometry(QtCore.QRect(190, 60, 113, 20))
         #self.spinBox.valueChanged[int].connect(on_value_changed1)
         #self.spinBox.valueChanged[str].connect(on_value_changed2)
         
@@ -120,16 +134,25 @@ class Ui_MainWindow(QMainWindow):
         self.label_3.setFont(font)
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
-        self.comboBox = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox.setGeometry(QtCore.QRect(190, 140, 111, 22))
-        self.comboBox.setCurrentText("")
-        self.comboBox.setMaxVisibleItems(12)
-        self.comboBox.setObjectName("comboBox")
-        self.comboBox.addItems(["Медленная", "Средняя", "Высокая"])
+        self.FeetcomboBox = QtWidgets.QComboBox(self.groupBox)
+        self.FeetcomboBox.setGeometry(QtCore.QRect(190, 140, 113, 22))
+        self.FeetcomboBox.setCurrentText("")
+        self.FeetcomboBox.setMaxVisibleItems(12)
+        self.FeetcomboBox.setObjectName("comboBox")
+        self.FeetcomboBox.addItems(["Медленная", "Средняя", "Высокая"])
         ## ---
-        self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
-        self.lineEdit_2.setGeometry(QtCore.QRect(190, 100, 113, 20))
-        self.lineEdit_2.setObjectName("lineEdit_2")
+        #self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
+        #self.lineEdit_2.setGeometry(QtCore.QRect(190, 100, 113, 20))
+        #self.lineEdit_2.setObjectName("lineEdit_2")
+
+        self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
+        self.ValueStepsSpinBox.setRange(0, 100)
+        self.ValueStepsSpinBox.setValue(1)
+        self.ValueStepsSpinBox.setSingleStep(1)
+        # self.spinBox.setPrefix("текст до (")
+        self.ValueStepsSpinBox.setSuffix(" шаг(-а, -ов)")
+        self.ValueStepsSpinBox.setGeometry(QtCore.QRect(190, 100, 113, 20))
+        
         self.label_4 = QtWidgets.QLabel(self.groupBox)
         self.label_4.setGeometry(QtCore.QRect(10, 190, 131, 31))
         font = QtGui.QFont()
@@ -238,7 +261,7 @@ class Ui_MainWindow(QMainWindow):
         #self.lineEdit.setInputMask(_translate("MainWindow", "99999"))
         self.label_2.setText(_translate("MainWindow", "Количество шагов:"))
         self.label_3.setText(_translate("MainWindow", "Скорость вращения:"))
-        self.lineEdit_2.setInputMask(_translate("MainWindow", "99999"))
+        #self.lineEdit_2.setInputMask(_translate("MainWindow", "99999"))
         self.label_4.setText(_translate("MainWindow", "Задержка перед стартом:"))
         self.label_5.setText(_translate("MainWindow", "Задержка между поворотами:"))
         self.label_6.setText(_translate("MainWindow", "Направление вращения:"))
