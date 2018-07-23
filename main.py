@@ -11,11 +11,13 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QMainWindow, QAction, qApp, QWidget, QLabel, QLineEdit, QTextEdit, QGridLayout, QApplication, QHBoxLayout)
 import sys
 import comscanner
+import board
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.board = board.Board()
     
     def onChanged(self, text):
         self.lineEdit.setText(text)
@@ -41,6 +43,22 @@ class Ui_MainWindow(QMainWindow):
         groupBox = QtWidgets.QGroupBox(centralwidget)
         groupBox.setGeometry(QtCore.QRect(5, 10, 290, 130))
         groupBox.setObjectName("groupBox")
+
+        comboBox_SerialPorts = QtWidgets.QComboBox(groupBox)
+        comboBox_SerialPorts.setGeometry(QtCore.QRect(5, 5, 231, 22))
+        comboBox_SerialPorts.setCurrentText("")
+        comboBox_SerialPorts.setMaxVisibleItems(12)
+        comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
+        comboBox_SerialPorts.addItems(self.board.get_serial_list())
+
+        pushButton = QtWidgets.QPushButton(groupBox)
+        pushButton.setGeometry(QtCore.QRect(20, 80, 221, 51))
+        pushButton.setCheckable(False)
+        pushButton.setObjectName("pushButton")
+        _translate = QtCore.QCoreApplication.translate
+        pushButton.setText(_translate("MainWindow", "подключить"))
+        
+        self.statusBar().showMessage('подключено')
         
         modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         modalWindow.move(self.geometry().center() - modalWindow.rect().center() - QtCore.QPoint(100, 50))
@@ -207,7 +225,7 @@ class Ui_MainWindow(QMainWindow):
         self.setGeometry(300, 300, 300, 200)
         self.setWindowTitle('Круглый стол')
 
-        self.statusBar().showMessage('Ready')
+        self.statusBar().showMessage('Не подключено')
         
         self.show()
 
