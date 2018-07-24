@@ -249,14 +249,14 @@ class Board(object):
         """Obtain list of serial devices"""
         baselist = []
         if system == 'Windows':
-            import _winreg
+            import winreg
             try:
-                key = _winreg.OpenKey(
-                    _winreg.HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM")
+                key = winreg.OpenKey(
+                    winreg.HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM")
                 i = 0
                 while True:
                     try:
-                        values = _winreg.EnumValue(key, i)
+                        values = winreg.EnumValue(key, i)
                     except:
                         return baselist
                     if 'USBSER' in values[0] or \

@@ -19,9 +19,9 @@ class Ui_MainWindow(QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.board = board.Board()
-        #self.board.serial_name = self.board.get_serial_list()[0]
+        self.board.serial_name = self.board.get_serial_list()[0]
         #self.is_connect = False
-        self.steps = 1
+        self.steps = 10
         
         
     def motor_invert(self, choos):
@@ -49,6 +49,8 @@ class Ui_MainWindow(QMainWindow):
         
     def Rotate(self):
         if self.board._is_connected:
+            #print('Connect')
+            self.board.motor_enable()
             self.board.motor_move(step=self.steps)
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
@@ -78,8 +80,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_SerialPorts.setCurrentText("")
         self.comboBox_SerialPorts.setMaxVisibleItems(12)
         self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
-        
-        #self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
 
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
