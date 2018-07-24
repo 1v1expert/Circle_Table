@@ -2,9 +2,11 @@
 
 # Form implementation generated from reading ui file 'apps.form2.ui'
 #
-# Created by: VLADDOS
-#
-#
+# This file is part of the 3DCircle Project
+
+__author__ = 'Sazonov Vladislav Sergeevich <1v1expert@gmail.com>'
+__copyright__ = 'Copyright (C) 2018 VLADDOS'
+__license__ = 'GNU General Public License v2 http://www.gnu.org/licenses/gpl2.html'
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtGui import QIcon

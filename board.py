@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# This file is part of the Horus Project
+# This file is part of the 3DCircle Project
 
 __author__ = 'Sazonov Vladislav Sergeevich <1v1expert@gmail.com>'
 __copyright__ = 'Copyright (C) 2018 VLADDOS'

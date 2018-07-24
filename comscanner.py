@@ -1,4 +1,10 @@
 # -*- coding: utf-8 -*-
+# This file is part of the 3DCircle Project
+
+__author__ = 'Sazonov Vladislav Sergeevich <1v1expert@gmail.com>'
+__copyright__ = 'Copyright (C) 2018 VLADDOS'
+__license__ = 'GNU General Public License v2 http://www.gnu.org/licenses/gpl2.html'
+
 import sys, glob, time, serial, os, struct, subprocess, threading, struct
 
 std_speeds = ['1843200', '921600', '460800', '230400', '115200', '57600', '38400', '19200', '9600', '4800', '2400',
