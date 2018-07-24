@@ -86,7 +86,7 @@ class Board(object):
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
                 # Set current position as origin
-                self.motor_reset_origin()
+                #self.motor_reset_origin()
                 logger.info(" Done")
                 return True
                 #else:
