@@ -81,16 +81,16 @@ class Board(object):
                 #if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
                 #    raise OldFirmware()
                 # elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
-                if version.decode('utf-8'):
-                    self.motor_speed(1)
-                    self._serial_port.timeout = 0.05
-                    self._is_connected = True
-                    # Set current position as origin
-                    self.motor_reset_origin()
-                    logger.info(" Done")
-                    return True
-                else:
-                    return False
+                #if version.decode('utf-8'):
+                self.motor_speed(1)
+                self._serial_port.timeout = 0.05
+                self._is_connected = True
+                # Set current position as origin
+                self.motor_reset_origin()
+                logger.info(" Done")
+                return True
+                #else:
+                    #return False
                     #raise WrongFirmware()
             else:
                 raise BoardNotConnected()
