@@ -19,7 +19,7 @@ class Ui_MainWindow(QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.board = board.Board()
-        self.board.serial_name = self.board.get_serial_list()[0]
+        #self.board.serial_name = self.board.get_serial_list()[0]
         #self.is_connect = False
         self.steps = 1
         
