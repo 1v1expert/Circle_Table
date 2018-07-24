@@ -21,7 +21,7 @@ class Ui_MainWindow(QMainWindow):
         super().__init__()
         self.setupUi(self)
         self.board = board.Board()
-        self.board.serial_name = self.board.get_serial_list()[0]
+        #self.board.serial_name = self.board.get_serial_list()[0]
         #self.is_connect = False
         self.steps = 10
         
@@ -85,7 +85,10 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_SerialPorts.setCurrentText("")
         self.comboBox_SerialPorts.setMaxVisibleItems(12)
         self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
-        self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        if (len(self.board.get_serial_list())):
+            self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        else:
+            self.comboBox_SerialPorts.addItems(['Устройства не найдены'])
 
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
