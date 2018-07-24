@@ -46,8 +46,11 @@ class Ui_MainWindow(QMainWindow):
         self.board.serial_name = serial_name
     
     def onConnectBoard(self):
+        if self.board.connect():
+            self.statusBar().showMessage('Подключено')
+        else:
+            self.statusBar().showMessage('Не удалось подключиться')
         self.modalWindow.close()
-        self.board.connect()
         
     def Rotate(self):
         if self.board._is_connected:

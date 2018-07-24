@@ -88,14 +88,17 @@ class Board(object):
                     # Set current position as origin
                     self.motor_reset_origin()
                     logger.info(" Done")
+                    return True
                 else:
-                    raise WrongFirmware()
+                    return False
+                    #raise WrongFirmware()
             else:
                 raise BoardNotConnected()
         except Exception as exception:
             logger.error("Error opening the port {0}\n".format(self.serial_name))
             self._serial_port = None
-            raise exception
+            return False
+            #raise exception
 
     '''def disconnect(self):
         """Close serial port"""
