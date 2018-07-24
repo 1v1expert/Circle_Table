@@ -78,7 +78,8 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_SerialPorts.setCurrentText("")
         self.comboBox_SerialPorts.setMaxVisibleItems(12)
         self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
-        self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        
+        #self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
 
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
