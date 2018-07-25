@@ -1,0 +1,10 @@
+future==0.16.0
+Horus==0.2rc1
+iso8601==0.1.12
+PyQt5==5.11.2
+PyQt5-sip==4.19.12
+pyserial==3.4
+PyYAML==3.13
+serial==0.0.67
+six==1.11.0
+wxPython==4.0.1

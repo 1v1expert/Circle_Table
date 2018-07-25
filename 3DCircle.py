@@ -10,8 +10,9 @@ import sys
 from PyQt5.QtWidgets import QApplication
 import logging
 
+logging.basicConfig(filename='3dcircle.log', level=logging.INFO)
+
 if __name__=='__main__':
-    logging.basicConfig(filename='3dcircle.log', level=logging.INFO)
     app = QApplication(sys.argv)
     ui = main.Ui_MainWindow()
     logging.info('Success start APP')
