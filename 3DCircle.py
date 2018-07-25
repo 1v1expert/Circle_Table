@@ -8,8 +8,11 @@ __license__ = 'GNU General Public License v2 http://www.gnu.org/licenses/gpl2.ht
 import main
 import sys
 from PyQt5.QtWidgets import QApplication
+import logging
 
 if __name__=='__main__':
+    logging.basicConfig(filename='3dcircle.log', level=logging.INFO)
     app = QApplication(sys.argv)
     ui = main.Ui_MainWindow()
+    logging.info('Success start APP')
     sys.exit(app.exec_())

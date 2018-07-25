@@ -12,6 +12,7 @@ import platform
 import serial
 
 import logging
+
 logger = logging.getLogger(__name__)
 
 system = platform.system()
@@ -76,6 +77,7 @@ class Board(object):
         try:
             self._serial_port = serial.Serial(self.serial_name, self.baud_rate, timeout=2)
             if self._serial_port.isOpen():
+                logger.info("Try openning serial port on {0}\n".format(system))
                 #self._reset()  # Force Reset and flush
                 #version = self._serial_port.readline()
                 #if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
