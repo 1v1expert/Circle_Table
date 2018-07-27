@@ -18,7 +18,8 @@ import time
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
-        
+        self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800',
+                      '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
         self.degrees = 11
         self.steps = 1
         self.feet = 1000
@@ -50,6 +51,9 @@ class Ui_MainWindow(QMainWindow):
 
     def onSetSerial(self, serial_name):
         self.board.serial_name = serial_name
+        
+    def onSetSpeeds(self, speed):
+        self.board.baud_rate = int(speed)
     
     def onConnectBoard(self):
         if self.board.connect():
@@ -85,16 +89,16 @@ class Ui_MainWindow(QMainWindow):
         # Parts 11.
         self.modalWindow = QWidget(self, QtCore.Qt.Window)
         self.modalWindow.setWindowTitle("Настройки")
-        self.modalWindow.resize(300, 150)
-        self.modalWindow.setMinimumSize(QtCore.QSize(300, 150))
-        self.modalWindow.setMaximumSize(QtCore.QSize(300, 150))
+        self.modalWindow.resize(450, 150)
+        self.modalWindow.setMinimumSize(QtCore.QSize(450, 150))
+        self.modalWindow.setMaximumSize(QtCore.QSize(450, 150))
         # modalWindow.setWindowModality(QtCore.Qt.WindowModal)
         #-- central widget
         self.centralwidget = QtWidgets.QWidget(self.modalWindow)
         self.centralwidget.setObjectName("centralwidget")
         #-- group box
         self.groupBox = QtWidgets.QGroupBox(self.centralwidget)
-        self.groupBox.setGeometry(QtCore.QRect(5, 10, 290, 130))
+        self.groupBox.setGeometry(QtCore.QRect(5, 10, 440, 130))
         self.groupBox.setObjectName("groupBox")
         self.groupBox.setTitle(_translate("MainWindow", "Настройка подключения"))
 
@@ -107,11 +111,21 @@ class Ui_MainWindow(QMainWindow):
             self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
         else:
             self.comboBox_SerialPorts.addItems(['Устройства не найдены'])
-
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
+        self.comboBox_Std_speeds = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_Std_speeds.setGeometry(QtCore.QRect(300, 25, 120, 22))
+        self.comboBox_Std_speeds.setCurrentText("")
+        self.comboBox_Std_speeds.setMaxVisibleItems(12)
+        self.comboBox_Std_speeds.setObjectName("comboBox_Std_speeds")
+        #if (len(self.board.get_serial_list())):
+        #    self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        #else:
+        self.comboBox_Std_speeds.addItems(self.std_speeds)
+        self.comboBox_Std_speeds.activated[str].connect(self.onSetSpeeds)
+        
         self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButton.setGeometry(QtCore.QRect(20, 80, 221, 51))
+        self.ConnectButton.setGeometry(QtCore.QRect(90, 80, 221, 51))
         self.ConnectButton.setCheckable(False)
         self.ConnectButton.setObjectName("pushButton")
         
@@ -241,19 +255,22 @@ class Ui_MainWindow(QMainWindow):
 
         self.Delay_between_turns = QtWidgets.QSpinBox(self.groupBox)
         self.Delay_between_turns.setRange(0, 1000)
-        self.Delay_between_turns.setValue(1)
+        self.Delay_between_turns.setValue(self.delay_between_turns)
         self.Delay_between_turns.setSingleStep(10)
         # self.spinBox.setPrefix("текст до (")
         self.Delay_between_turns.setSuffix(" c")
         self.Delay_between_turns.setGeometry(QtCore.QRect(190, 240, 113, 20))
+        self.Delay_between_turns.valueChanged[int].connect(self.Changedelay_between_turns)
+        
 
         self.Delay_before_start = QtWidgets.QSpinBox(self.groupBox)
         self.Delay_before_start.setRange(0, 1000)
-        self.Delay_before_start.setValue(1)
+        self.Delay_before_start.setValue(self.delay_before_start)
         self.Delay_before_start.setSingleStep(10)
         # self.spinBox.setPrefix("текст до (")
         self.Delay_before_start.setSuffix(" c")
         self.Delay_before_start.setGeometry(QtCore.QRect(190, 190, 113, 20))
+        self.Delay_before_start.valueChanged[int].connect(self.ChangeDelay_before_start)
         #self.Delay_before_start.setGeometry(QtCore.QRect(190, 240, 113, 20))
         
         #self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
