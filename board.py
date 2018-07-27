@@ -84,7 +84,7 @@ class Board(object):
                     if "1.1.0-RC7_3DQ0.2" in ver.decode('utf-8'):
                         print('SUCCESS INPLUG')
                     print(ver.decode('utf-8'))
-                
+                logger.info(version)
                 #info = self.read(True)
                 #print(info)
                 

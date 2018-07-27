@@ -86,7 +86,7 @@ class Ui_MainWindow(QMainWindow):
         
     def Rotate(self):
         if self.board._is_connected:
-            print('Connect')
+            print('Start rotate')
             #self.board.motor_enable()
             time.sleep(self.delay_before_start)
             print('motor speed = ', self.board._motor_speed, " steps = ", self.degrees)
