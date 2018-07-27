@@ -20,10 +20,10 @@ class Ui_MainWindow(QMainWindow):
     def __init__(self):
         self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800',
                       '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
-        self.degrees = 11
+        self.degrees = 10
         self.steps = 1
-        self.feet = 1000
-        self.delay_before_start = 1
+        self.rate = 1000
+        self.delay_before_start = 0
         self.delay_between_turns = 1
         self.invert = False
         
@@ -38,6 +38,16 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(True)
         else:
             self.board.motor_invert(False)
+            
+    def ChangeRate_motor(self, rate):
+        #["Медленная", "Средняя", "Высокая"]
+        speed = 1000
+        if rate == "Медленная": speed = 1000
+        elif rate == "Средняя": speed = 5000
+        elif rate == "Высокая": speed = 20000
+        #self.board._motor_speed = speed
+        self.board.motor_speed(speed)
+        print(speed)
         
     def onChanged(self, text):
         self.lineEdit.setText(text)
@@ -52,7 +62,7 @@ class Ui_MainWindow(QMainWindow):
     def onSetSerial(self, serial_name):
         self.board.serial_name = serial_name
         
-    def onSetSpeeds(self, speed):
+    def onSetSerialSpeeds(self, speed):
         self.board.baud_rate = int(speed)
     
     def onConnectBoard(self):
@@ -78,7 +88,15 @@ class Ui_MainWindow(QMainWindow):
         if self.board._is_connected:
             print('Connect')
             #self.board.motor_enable()
-            self.board.motor_move(step=self.steps*self.degrees)
+            time.sleep(self.delay_before_start)
+            print('motor speed = ', self.board._motor_speed, " steps = ", self.degrees)
+            
+            for rt in range(self.steps):
+                sec = float(self.degrees / self.board._motor_speed)
+                print("sec = ", 10 * sec * 6, " sleep = ", sec + self.delay_between_turns)
+                self.board.motor_move(step=self.degrees)
+                time.sleep(60 * sec + self.delay_between_turns)
+            
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()
@@ -122,7 +140,7 @@ class Ui_MainWindow(QMainWindow):
         #    self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
         #else:
         self.comboBox_Std_speeds.addItems(self.std_speeds)
-        self.comboBox_Std_speeds.activated[str].connect(self.onSetSpeeds)
+        self.comboBox_Std_speeds.activated[str].connect(self.onSetSerialSpeeds)
         
         self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
         self.ConnectButton.setGeometry(QtCore.QRect(90, 80, 221, 51))
@@ -198,12 +216,13 @@ class Ui_MainWindow(QMainWindow):
         self.label_3.setFont(font)
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
-        self.FeetcomboBox = QtWidgets.QComboBox(self.groupBox)
-        self.FeetcomboBox.setGeometry(QtCore.QRect(190, 140, 113, 22))
-        self.FeetcomboBox.setCurrentText("")
-        self.FeetcomboBox.setMaxVisibleItems(12)
-        self.FeetcomboBox.setObjectName("comboBox")
-        self.FeetcomboBox.addItems(["Медленная", "Средняя", "Высокая"])
+        self.RateComboBox = QtWidgets.QComboBox(self.groupBox)
+        self.RateComboBox.setGeometry(QtCore.QRect(190, 140, 113, 22))
+        self.RateComboBox.setCurrentText("")
+        self.RateComboBox.setMaxVisibleItems(12)
+        self.RateComboBox.setObjectName("comboBox")
+        self.RateComboBox.addItems(["Медленная", "Средняя", "Высокая"])
+        self.RateComboBox.activated[str].connect(self.ChangeRate_motor)
         ## ---
         #self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
         #self.lineEdit_2.setGeometry(QtCore.QRect(190, 100, 113, 20))

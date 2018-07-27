@@ -63,7 +63,7 @@ class Board(object):
         self._is_connected = False
         self._motor_enabled = False
         self._motor_position = 0
-        self._motor_speed = 0
+        self._motor_speed = 1000
         self._motor_acceleration = 0
         self._motor_direction = 1
         self._laser_number = 2
@@ -105,12 +105,15 @@ class Board(object):
                 # elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
                 #if version.decode('utf-8'):
                 #self._reset()  # Force Reset and flush
+                time.sleep(2)
                 self.motor_enable()
                 info = self.read(False)
                 print(info)
-                self.motor_speed(1000)
-                info = self.read(False)
-                print(info)
+                
+                #time.sleep(2)
+                #self.motor_move(20)
+                #info = self.read(False)
+                #print(info)
                 #version = self._serial_port.readlines()
                 #for ver in version:
                 #    print(ver.decode('utf-8'))
@@ -118,6 +121,10 @@ class Board(object):
                 #print(version)
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
+                time.sleep(2)
+                self.motor_move(step=0)
+                info = self.read(False)
+                print(info)
                 # Set current position as origin
                 #self.motor_reset_origin()
                 logger.info(" Done")
