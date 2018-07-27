@@ -152,7 +152,7 @@ def start_platform():
     print(message_b)
     ser.close()
 
-def get_start(serial_name = '/dev/tty.wchusbserial1410', baud_rate = '115200'):
+def get_start(serial_name = '/dev/cu.usbmodem1411', baud_rate = '115200'):
     serial_port = serial.Serial(serial_name, baud_rate, timeout=2)
     is_connected = False
     def motor_reset_origin():
@@ -185,6 +185,7 @@ def get_start(serial_name = '/dev/tty.wchusbserial1410', baud_rate = '115200'):
         print('Port open')
         reset()
         version = serial_port.readline()
+        print(version)
         if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
             raise OldFirmware()
         elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):

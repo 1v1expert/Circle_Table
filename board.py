@@ -53,7 +53,7 @@ class Board(object):
 
     """
 
-    def __init__(self, parent=None, serial_name='/dev/ttyUSB0', baud_rate=115200):
+    def __init__(self, parent=None, serial_name='/dev/ttyUSB0', baud_rate=250000):
         self.parent = parent
         self.serial_name = serial_name
         self.baud_rate = baud_rate
@@ -78,13 +78,44 @@ class Board(object):
             self._serial_port = serial.Serial(self.serial_name, self.baud_rate, timeout=2)
             if self._serial_port.isOpen():
                 logger.info("Try openning serial port on {0}\n".format(system))
-                #self._reset()  # Force Reset and flush
-                #version = self._serial_port.readline()
+                
+                version = self._serial_port.readlines()
+                for ver in version:
+                    if "1.1.0-RC7_3DQ0.2" in ver.decode('utf-8'):
+                        print('SUCCESS INPLUG')
+                    print(ver.decode('utf-8'))
+                
+                #info = self.read(True)
+                #print(info)
+                
+                
+                #self._serial_port.write("G1X10".encode('utf-8'))
+                #G1F{0}
+                #version = self._serial_port.readlines()
+                #print(version)
+                #self._serial_port.write("G1F5000".encode('utf-8'))
+                #version = self._serial_port.readlines()
+                #print(version)
+                #self._serial_port.write("G1X100".encode('utf-8'))
+                #while version != "b''":
+                #    version = self._serial_port.readline()
+                #    print(version)
                 #if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
                 #    raise OldFirmware()
                 # elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
                 #if version.decode('utf-8'):
-                self.motor_speed(10)
+                #self._reset()  # Force Reset and flush
+                self.motor_enable()
+                info = self.read(False)
+                print(info)
+                self.motor_speed(1000)
+                info = self.read(False)
+                print(info)
+                #version = self._serial_port.readlines()
+                #for ver in version:
+                #    print(ver.decode('utf-8'))
+                #version = self._serial_port.readline()
+                #print(version)
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
                 # Set current position as origin
@@ -162,37 +193,12 @@ class Board(object):
             self._send_command("G50")
             self._motor_position = 0
 
-    def motor_move(self, step=0, nonblocking=False, callback=None):
+    def motor_move(self, step=0, nonblocking=True, callback=True):
         if self._is_connected:
             self._motor_position += step * self._motor_direction
+            print(self._motor_position)
             self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
 
-    def laser_on(self, index):
-        if self._is_connected:
-            if not self._laser_enabled[index]:
-                self._laser_enabled[index] = True
-                self._send_command("M71T" + str(index + 1))
-
-    def laser_off(self, index):
-        if self._is_connected:
-            if self._laser_enabled[index]:
-                self._laser_enabled[index] = False
-                self._send_command("M70T" + str(index + 1))
-
-    def lasers_on(self):
-        for i in range(self._laser_number):
-            self.laser_on(i)
-
-    def lasers_off(self):
-        for i in range(self._laser_number):
-            self.laser_off(i)
-
-    def ldr_sensor(self, pin):
-        value = self._send_command("M50T" + pin, read_lines=True).split("\n")[0]
-        try:
-            return int(value)
-        except ValueError:
-            return 0
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False):
         if nonblocking:
@@ -210,25 +216,32 @@ class Board(object):
                 try:
                     self._serial_port.flushInput()
                     self._serial_port.flushOutput()
-                    self._serial_port.write(req + "\r\n".encode('utf-8'))
+                    self._serial_port.write(req + "\n".encode('utf-8'))
                     while req != '~' and req != '!' and ret == '':
+                        #ret = self._serial_port.readlines()
                         ret = self.read(read_lines)
+                        #self._reset()
+                        print('ret = ', ret, 'req=', req)
                         time.sleep(0.01)
                     self._success()
+                    #ret = self.read(read_lines)
+                    print('succes send command')
                 except:
+                    print("False send command")
                     if hasattr(self, '_serial_port'):
                         if callback is not None:
                             callback(ret)
                         self._fail()
         if callback is not None:
-            callback(ret)
+            print(ret)
+            #callback(ret)
         return ret
 
     def read(self, read_lines=False):
         if read_lines:
             return ''.join(self._serial_port.readlines())
         else:
-            return ''.join(self._serial_port.readline())
+            return ''.join(self._serial_port.readline().decode('utf-8'))
 
     def _success(self):
         self._tries = 0

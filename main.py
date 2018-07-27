@@ -18,12 +18,18 @@ import time
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
+        
+        self.degrees = 11
+        self.steps = 1
+        self.feet = 1000
+        self.delay_before_start = 1
+        self.delay_between_turns = 1
+        self.invert = False
+        
         super().__init__()
         self.setupUi(self)
         self.board = board.Board()
-        #self.board.serial_name = self.board.get_serial_list()[0]
-        #self.is_connect = False
-        self.steps = 10
+        
         
         
     def motor_invert(self, choos):
@@ -51,12 +57,24 @@ class Ui_MainWindow(QMainWindow):
         else:
             self.statusBar().showMessage('Не удалось подключиться')
         self.modalWindow.close()
+    
+    def changeDegrees(self, degree):
+        self.degrees = degree
+        
+    def changeSteps(self, step):
+        self.steps = step
+    
+    def ChangeDelay_before_start(self, sec):
+        self.delay_before_start = sec
+    
+    def Changedelay_between_turns(self, sec):
+        self.delay_between_turns = sec
         
     def Rotate(self):
         if self.board._is_connected:
-            #print('Connect')
-            self.board.motor_enable()
-            self.board.motor_move(step=self.steps)
+            print('Connect')
+            #self.board.motor_enable()
+            self.board.motor_move(step=self.steps*self.degrees)
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()
@@ -132,13 +150,15 @@ class Ui_MainWindow(QMainWindow):
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
 
-        self.StepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
-        self.StepsSpinBox.setRange(0, 100)
-        self.StepsSpinBox.setValue(10)
-        self.StepsSpinBox.setSingleStep(5)
+        self.DegreesSpinBox = QtWidgets.QSpinBox(self.groupBox)
+        self.DegreesSpinBox.setRange(0, 1000)
+        self.DegreesSpinBox.setValue(self.degrees)
+        self.DegreesSpinBox.setSingleStep(5)
         #self.spinBox.setPrefix("текст до (")
-        self.StepsSpinBox.setSuffix(" градусов")
-        self.StepsSpinBox.setGeometry(QtCore.QRect(190, 60, 113, 20))
+        self.DegreesSpinBox.setSuffix(" градусов")
+        self.DegreesSpinBox.setGeometry(QtCore.QRect(190, 60, 113, 20))
+        self.DegreesSpinBox.valueChanged[int].connect(self.changeDegrees)
+        
         #self.spinBox.valueChanged[int].connect(on_value_changed1)
         #self.spinBox.valueChanged[str].connect(on_value_changed2)
         
@@ -178,10 +198,12 @@ class Ui_MainWindow(QMainWindow):
         self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.ValueStepsSpinBox.setRange(0, 100)
         self.ValueStepsSpinBox.setValue(1)
-        self.ValueStepsSpinBox.setSingleStep(1)
+        self.ValueStepsSpinBox.setSingleStep(self.steps)
         # self.spinBox.setPrefix("текст до (")
         self.ValueStepsSpinBox.setSuffix(" шаг(-а, -ов)")
         self.ValueStepsSpinBox.setGeometry(QtCore.QRect(190, 100, 113, 20))
+        self.ValueStepsSpinBox.valueChanged[int].connect(self.changeSteps)
+        
         
         self.label_4 = QtWidgets.QLabel(self.groupBox)
         self.label_4.setGeometry(QtCore.QRect(10, 190, 131, 31))
