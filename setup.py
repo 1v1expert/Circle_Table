@@ -26,11 +26,11 @@ setup(
 	# zipfile=None,
 	options={
 		"py2exe": {
-			"includes":["sip", "atexit",],  # даже если мы нигде не используем atexit его надо добавить, sip указываем явно - сборщики часто про него забывают 
+			"includes":["sip", "atexit",],
 			# "packages": ['PyQt5'],
 			"compressed": True,
 			"dist_dir": "dist/" + NAME,
-			# "bundle_files": 0, # не сработало ( с этой опцией на выходе прога не может найти msvc*.dll 
+			# "bundle_files": 0, # не сработало ( с этой опцией на выходе прога не может найти msvc*.dll
 			# "zipfile": None, # тоже лишнее
 			"optimize": 2,
 		}
