@@ -296,7 +296,7 @@ class Ui_MainWindow(QMainWindow):
         self.label_7.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_7.setText("")
         self.label_7.setTextFormat(QtCore.Qt.AutoText)
-        self.label_7.setPixmap(QtGui.QPixmap("img/logotype_3D.jpg"))
+        self.label_7.setPixmap(QtGui.QPixmap("img/logotype.jpg"))
         self.label_7.setScaledContents(True)
         self.label_7.setObjectName("label_7")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -329,7 +329,7 @@ class Ui_MainWindow(QMainWindow):
         menubar = self.menuBar()
         fileMenu = menubar.addMenu('&Файл')
         fileMenu.addAction(exitAction)
-        #fileMenu.addAction(exitAction2)
+        fileMenu.addAction(settingsAction)
         
 
         self.setGeometry(300, 300, 300, 200)
