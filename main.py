@@ -296,7 +296,7 @@ class Ui_MainWindow(QMainWindow):
         self.label_7.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_7.setText("")
         self.label_7.setTextFormat(QtCore.Qt.AutoText)
-        self.label_7.setPixmap(QtGui.QPixmap("img/logotype.jpg"))
+        self.label_7.setPixmap(QtGui.QPixmap("img/logotype.png"))
         self.label_7.setScaledContents(True)
         self.label_7.setObjectName("label_7")
         MainWindow.setCentralWidget(self.centralwidget)
