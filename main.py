@@ -40,14 +40,13 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(False)
             
     def ChangeRate_motor(self, rate):
-        #["Медленная", "Средняя", "Высокая"]
         speed = 1000
         if rate == "Медленная": speed = 1000
         elif rate == "Средняя": speed = 5000
-        elif rate == "Высокая": speed = 20000
+        elif rate == "Высокая": speed = 10000
         #self.board._motor_speed = speed
         self.board.motor_speed(speed)
-        print(speed)
+
         
     def onChanged(self, text):
         self.lineEdit.setText(text)
@@ -110,7 +109,7 @@ class Ui_MainWindow(QMainWindow):
         self.modalWindow.resize(450, 150)
         self.modalWindow.setMinimumSize(QtCore.QSize(450, 150))
         self.modalWindow.setMaximumSize(QtCore.QSize(450, 150))
-        # modalWindow.setWindowModality(QtCore.Qt.WindowModal)
+
         #-- central widget
         self.centralwidget = QtWidgets.QWidget(self.modalWindow)
         self.centralwidget.setObjectName("centralwidget")
@@ -191,28 +190,15 @@ class Ui_MainWindow(QMainWindow):
         self.DegreesSpinBox.setGeometry(QtCore.QRect(190, 60, 113, 20))
         self.DegreesSpinBox.valueChanged[int].connect(self.changeDegrees)
         
-        #self.spinBox.valueChanged[int].connect(on_value_changed1)
-        #self.spinBox.valueChanged[str].connect(on_value_changed2)
-        
-        #self.lineEdit = QtWidgets.QLineEdit(self.groupBox)
-        #self.lineEdit.setGeometry(QtCore.QRect(190, 60, 113, 20))
-        #self.lineEdit.setObjectName("lineEdit")
-        
-        #self.lineEdit.textChanged[str].connect(self.onChanged)
         #---
         self.label_2 = QtWidgets.QLabel(self.groupBox)
         self.label_2.setGeometry(QtCore.QRect(10, 100, 131, 16))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.label_3 = QtWidgets.QLabel(self.groupBox)
         self.label_3.setGeometry(QtCore.QRect(10, 140, 141, 20))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        #print('sadsa')
+
         self.label_3.setFont(font)
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
@@ -224,9 +210,6 @@ class Ui_MainWindow(QMainWindow):
         self.RateComboBox.addItems(["Медленная", "Средняя", "Высокая"])
         self.RateComboBox.activated[str].connect(self.ChangeRate_motor)
         ## ---
-        #self.lineEdit_2 = QtWidgets.QLineEdit(self.groupBox)
-        #self.lineEdit_2.setGeometry(QtCore.QRect(190, 100, 113, 20))
-        #self.lineEdit_2.setObjectName("lineEdit_2")
 
         self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.ValueStepsSpinBox.setRange(0, 100)
@@ -276,7 +259,6 @@ class Ui_MainWindow(QMainWindow):
         self.Delay_between_turns.setRange(0, 1000)
         self.Delay_between_turns.setValue(self.delay_between_turns)
         self.Delay_between_turns.setSingleStep(10)
-        # self.spinBox.setPrefix("текст до (")
         self.Delay_between_turns.setSuffix(" c")
         self.Delay_between_turns.setGeometry(QtCore.QRect(190, 240, 113, 20))
         self.Delay_between_turns.valueChanged[int].connect(self.Changedelay_between_turns)
@@ -286,19 +268,10 @@ class Ui_MainWindow(QMainWindow):
         self.Delay_before_start.setRange(0, 1000)
         self.Delay_before_start.setValue(self.delay_before_start)
         self.Delay_before_start.setSingleStep(10)
-        # self.spinBox.setPrefix("текст до (")
         self.Delay_before_start.setSuffix(" c")
         self.Delay_before_start.setGeometry(QtCore.QRect(190, 190, 113, 20))
         self.Delay_before_start.valueChanged[int].connect(self.ChangeDelay_before_start)
-        #self.Delay_before_start.setGeometry(QtCore.QRect(190, 240, 113, 20))
-        
-        #self.lineEdit_3 = QtWidgets.QLineEdit(self.groupBox)
-        #self.lineEdit_3.setGeometry(QtCore.QRect(190, 240, 113, 20))
-        #self.lineEdit_3.setObjectName("lineEdit_3")
-        
-        #self.lineEdit_4 = QtWidgets.QLineEdit(self.groupBox)
-        #self.lineEdit_4.setGeometry(QtCore.QRect(190, 190, 113, 20))
-        #self.lineEdit_4.setObjectName("lineEdit_4")
+
 
         self.OpenSettings = QtWidgets.QPushButton(self.groupBox)
         self.OpenSettings.setGeometry(QtCore.QRect(150, 340, 121, 51))
@@ -323,7 +296,7 @@ class Ui_MainWindow(QMainWindow):
         self.label_7.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_7.setText("")
         self.label_7.setTextFormat(QtCore.Qt.AutoText)
-        self.label_7.setPixmap(QtGui.QPixmap("img/logo.png"))
+        self.label_7.setPixmap(QtGui.QPixmap("img/logotype_3D.jpg"))
         self.label_7.setScaledContents(True)
         self.label_7.setObjectName("label_7")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -342,6 +315,10 @@ class Ui_MainWindow(QMainWindow):
         exitAction.setStatusTip('Завершение приложения')
         exitAction.triggered.connect(qApp.quit)
 
+        settingsAction = QAction(QIcon('settings.png'), '&Settings', self)
+        settingsAction.setShortcut('Ctrl+S')
+        settingsAction.setStatusTip('Настройки')
+        settingsAction.triggered.connect(self.show_modal_window)
         #exitAction2 = QAction(QIcon('exit2.png'), '&Exit', self)
         #exitAction2.setShortcut('Ctrl+R')
         #exitAction2.setStatusTip('Вызов настроек')
@@ -377,7 +354,7 @@ class Ui_MainWindow(QMainWindow):
         self.label_6.setText(_translate("MainWindow", "Направление вращения:"))
         #self.lineEdit_3.setInputMask(_translate("MainWindow", "99999"))
         #self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
-        self.pushButton.setText(_translate("MainWindow", "Полетели !"))
+        self.pushButton.setText(_translate("MainWindow", "Старт"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
 
         self.OpenSettings.setText(_translate("MainWindow", "Настройки"))
