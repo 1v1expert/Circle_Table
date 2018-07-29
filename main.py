@@ -310,12 +310,12 @@ class Ui_MainWindow(QMainWindow):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-        exitAction = QAction(QIcon('exit.png'), '&Exit', self)
+        exitAction = QAction(QIcon('img/exit.png'), '&Exit', self)
         exitAction.setShortcut('Ctrl+Q')
         exitAction.setStatusTip('Завершение приложения')
         exitAction.triggered.connect(qApp.quit)
 
-        settingsAction = QAction(QIcon('settings.png'), '&Settings', self)
+        settingsAction = QAction(QIcon('img/settings.png'), '&Settings', self)
         settingsAction.setShortcut('Ctrl+S')
         settingsAction.setStatusTip('Настройки')
         settingsAction.triggered.connect(self.show_modal_window)
