@@ -46,11 +46,6 @@ class Board(object):
         G1 Xnnn : move motor
         G50     : reset origin position
 
-        M70 Tn  : switch off laser n
-        M71 Tn  : switch on laser n
-
-        M50 Tn  : read ldr sensor
-
     """
 
     def __init__(self, parent=None, serial_name='', baud_rate=250000):
