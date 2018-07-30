@@ -53,7 +53,7 @@ class Board(object):
 
     """
 
-    def __init__(self, parent=None, serial_name='/dev/ttyUSB0', baud_rate=250000):
+    def __init__(self, parent=None, serial_name='', baud_rate=250000):
         self.parent = parent
         self.serial_name = serial_name
         self.baud_rate = baud_rate

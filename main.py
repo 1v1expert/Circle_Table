@@ -65,7 +65,15 @@ class Ui_MainWindow(QMainWindow):
         self.board.baud_rate = int(speed)
     
     def onConnectBoard(self):
-        if self.board.connect():
+        f_rot = True
+        if not self.board.serial_name:
+            if (len(self.board.get_serial_list())):
+                self.board.serial_name = self.board.get_serial_list()[0]
+            else:
+                f_rot = False
+                self.statusBar().showMessage('Нет доступного порта')
+                
+        if self.board.connect() and f_rot:
             self.statusBar().showMessage('Подключено')
         else:
             self.statusBar().showMessage('Не удалось подключиться')
