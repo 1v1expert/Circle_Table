@@ -4,7 +4,7 @@ block_cipher = None
 
 
 a = Analysis(['3DCircle.py'],
-             pathex=['C:/Python34/Lib/site-packages/PyQt5', 'C:\\Users\\ROOT\\Desktop\\CTable\\Circle_Table'],
+             pathex=['C:\\Users\\ROOT\\Desktop\\CTable\\Circle_Table'],
              binaries=[],
              datas=[],
              hiddenimports=[],
