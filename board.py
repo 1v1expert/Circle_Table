@@ -106,9 +106,9 @@ class Board(object):
                 #if version.decode('utf-8'):
                 #self._reset()  # Force Reset and flush
                 time.sleep(2)
-                #self.motor_enable()
-                #info = self.read(False)
-                #print(info)
+                self.motor_enable()
+                info = self.read(False)
+                print(info)
                 
                 #time.sleep(2)
                 #self.motor_move(20)
