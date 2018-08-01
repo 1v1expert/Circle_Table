@@ -58,7 +58,7 @@ class Board(object):
         self._is_connected = False
         self._motor_enabled = False
         self._motor_position = 0
-        self._motor_speed = 1000
+        self._motor_speed = 750
         self._motor_acceleration = 0
         self._motor_direction = 1
         self._laser_number = 2

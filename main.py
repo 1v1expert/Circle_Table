@@ -22,7 +22,7 @@ class Ui_MainWindow(QMainWindow):
                       '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
         self.degrees = 10
         self.steps = 1
-        self.rate = 1000
+        self.rate = 750
         self.delay_before_start = 0
         self.delay_between_turns = 1
         self.invert = False
@@ -40,10 +40,10 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(False)
             
     def ChangeRate_motor(self, rate):
-        speed = 1000
-        if rate == "Медленная": speed = 1000
-        elif rate == "Средняя": speed = 5000
-        elif rate == "Высокая": speed = 10000
+        speed = 750
+        if rate == "Медленная": speed = 750
+        elif rate == "Средняя": speed = 3750
+        elif rate == "Высокая": speed = 7500
         #self.board._motor_speed = speed
         self.board.motor_speed(speed)
 
@@ -180,6 +180,8 @@ class Ui_MainWindow(QMainWindow):
         self.groupBox.setGeometry(QtCore.QRect(10, 20, 311, 411))
         self.groupBox.setObjectName("groupBox")
         
+        
+        
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(10, 50, 111, 41))
         font = QtGui.QFont()
@@ -231,26 +233,20 @@ class Ui_MainWindow(QMainWindow):
         
         self.label_4 = QtWidgets.QLabel(self.groupBox)
         self.label_4.setGeometry(QtCore.QRect(10, 190, 131, 31))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+
         self.label_4.setFont(font)
         self.label_4.setWordWrap(True)
         self.label_4.setObjectName("label_4")
         self.label_5 = QtWidgets.QLabel(self.groupBox)
         self.label_5.setGeometry(QtCore.QRect(10, 230, 131, 41))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+
         font.setKerning(True)
         self.label_5.setFont(font)
         self.label_5.setWordWrap(True)
         self.label_5.setObjectName("label_5")
         self.label_6 = QtWidgets.QLabel(self.groupBox)
         self.label_6.setGeometry(QtCore.QRect(10, 270, 131, 41))
-        font = QtGui.QFont()
-        font.setBold(True)
-        font.setWeight(75)
+
         self.label_6.setFont(font)
         self.label_6.setWordWrap(True)
         self.label_6.setObjectName("label_6")
@@ -298,13 +294,14 @@ class Ui_MainWindow(QMainWindow):
         self.OpenSettings.clicked.connect(self.show_modal_window)
         #self.pushButton.clicked.connect(self.find_ports)
         #self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
+        
         self.label_7 = QtWidgets.QLabel(self.centralwidget)
-        self.label_7.setGeometry(QtCore.QRect(330, 40, 215, 390))
+        self.label_7.setGeometry(QtCore.QRect(330, 30, 215, 390))
         self.label_7.setSizeIncrement(QtCore.QSize(0, 0))
         self.label_7.setFrameShadow(QtWidgets.QFrame.Raised)
         self.label_7.setText("")
         self.label_7.setTextFormat(QtCore.Qt.AutoText)
-        self.label_7.setPixmap(QtGui.QPixmap("img/logotype.png"))
+        self.label_7.setPixmap(QtGui.QPixmap("img/logo_vert.jpg"))
         self.label_7.setScaledContents(True)
         self.label_7.setObjectName("label_7")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -332,6 +329,12 @@ class Ui_MainWindow(QMainWindow):
         #exitAction2.setStatusTip('Вызов настроек')
         #exitAction2.triggered.connect(self.show_modal_window)
 
+        #self.centralwidget.setStyleSheet("""
+        #            color: white;
+        #            background-image: url(img/TmpSVG1.jpg);
+        #            background-attachment: scroll;
+        #        """)
+
         self.statusBar()
 
         menubar = self.menuBar()
@@ -341,7 +344,7 @@ class Ui_MainWindow(QMainWindow):
         
 
         self.setGeometry(300, 300, 300, 200)
-        self.setWindowTitle('Круглый стол')
+        self.setWindowTitle('3DQ Rotate')
 
         self.statusBar().showMessage('Не подключено')
         
