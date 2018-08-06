@@ -120,6 +120,15 @@ class Board(object):
                 self.motor_move(step=0)
                 info = self.read(False)
                 print(info)
+                self._send_command("M92 X45.3")
+                info = self.read(False)
+                print(info)
+                self._send_command("G92 X0")
+                info = self.read(False)
+                print(info)
+                self._send_command("G91")
+                info = self.read(False)
+                print(info)
                 # Set current position as origin
                 #self.motor_reset_origin()
                 logger.info(" Done")
@@ -135,20 +144,19 @@ class Board(object):
             return False
             #raise exception
 
-    '''def disconnect(self):
+    def disconnect(self):
         """Close serial port"""
         if self._is_connected:
             logger.info("Disconnecting board {0}".format(self.serial_name))
             try:
                 if self._serial_port is not None:
-                    self.lasers_off()
                     self.motor_disable()
                     self._is_connected = False
                     self._serial_port.close()
                     del self._serial_port
             except serial.SerialException:
                 logger.error("Error closing the port {0}\n".format(self.serial_name))
-            logger.info(" Done")'''
+            logger.info(" Done")
 
     def set_unplug_callback(self, value):
         self.unplug_callback = value
