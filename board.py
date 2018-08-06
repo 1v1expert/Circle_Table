@@ -80,26 +80,6 @@ class Board(object):
                         print('SUCCESS INPLUG')
                     print(ver.decode('utf-8'))
                 logger.info(version)
-                #info = self.read(True)
-                #print(info)
-                
-                
-                #self._serial_port.write("G1X10".encode('utf-8'))
-                #G1F{0}
-                #version = self._serial_port.readlines()
-                #print(version)
-                #self._serial_port.write("G1F5000".encode('utf-8'))
-                #version = self._serial_port.readlines()
-                #print(version)
-                #self._serial_port.write("G1X100".encode('utf-8'))
-                #while version != "b''":
-                #    version = self._serial_port.readline()
-                #    print(version)
-                #if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
-                #    raise OldFirmware()
-                # elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
-                #if version.decode('utf-8'):
-                #self._reset()  # Force Reset and flush
                 time.sleep(2)
                 self.motor_enable()
                 info = self.read(False)
@@ -124,9 +104,6 @@ class Board(object):
                 #self.motor_reset_origin()
                 logger.info(" Done")
                 return True
-                #else:
-                    #return False
-                    #raise WrongFirmware()
             else:
                 raise BoardNotConnected()
         except Exception as exception:

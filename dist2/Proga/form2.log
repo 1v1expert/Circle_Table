@@ -1,5 +1,0 @@
-Traceback (most recent call last):
-  File "form2.py", line 9, in <module>
-  File "<loader>", line 10, in <module>
-  File "<loader>", line 8, in __load
-ImportError: (DLL load failed: %1 не является приложением Win32.) 'C:\\Users\\ROOT\\Desktop\\CTable\\Circle_Table\\dist\\Proga\\PyQt5.QtCore.pyd'
