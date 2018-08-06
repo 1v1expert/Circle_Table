@@ -1,0 +1,13 @@
+{
+    "Init_command":[
+      {
+        "command": "M92 X45.3"
+      },
+      {
+        "command": "G92 X0"
+      },
+      {
+        "command": "G91"
+      }
+    ]
+}
