@@ -84,17 +84,17 @@ class Board(object):
                 logger.info("Try openning serial port on {0}\n".format(system))
                 
                 version = self._serial_port.readlines()
-                logger.info(version)
-                if version:
-                    for ver in version:
-                        if "1.1.0-RC7_3DQ0.2" in ver.decode('utf-8'):
-                            print('SUCCESS INPLUG')
-                        else:
-                            logger.info(" Error connect, not found 1.1.0-RC7_3DQ0.2 in FIRMWARE")
-                            return False
-                    logger.info(version)
-                else:
-                    return False
+                logger.info(" Version: ", version)
+                #if version:
+                #    for ver in version:
+                #        if "1.1.0-RC7_3DQ0.2" in ver.decode('utf-8'):
+                #            print('SUCCESS INPLUG')
+                #        else:
+                #            logger.info(" Error connect, not found 1.1.0-RC7_3DQ0.2 in FIRMWARE")
+                #            return False
+                #    logger.info(version)
+                #else:
+                #    return False
                 #info = self.read(True)
                 #print(info)
                 
