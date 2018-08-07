@@ -18,6 +18,11 @@ logger = logging.getLogger(__name__)
 system = platform.system()
 
 
+def read_configuration(self):
+    with open('config.json') as jfile:
+        jf_file = json.load(jfile)
+        return jf_file
+
 class WrongFirmware(Exception):
 
     def __init__(self):
@@ -64,15 +69,6 @@ class Board(object):
         self._laser_number = 2
         self._laser_enabled = self._laser_number * [False]
         self._tries = 0  # Check if command fails
-
-    def read_configuration(self):
-        with open('config.json') as jfile:
-            jf_file = json.load(jfile)
-            for cmd in jf_file['Init_command']:
-                self._send_command(cmd['command'])
-                response = self._serial_port.readlines()
-                time.sleep(0.5)
-                print(response)
     
     def connect(self):
         """Open serial port and perform handshake"""
@@ -137,7 +133,12 @@ class Board(object):
                 info = self.read(False)
                 print(info)
                 try:
-                    self.read_configuration()
+                    jf_file = read_configuration()
+                    for cmd in jf_file['Init_command']:
+                        self._send_command(cmd['command'])
+                        response = self._serial_port.readlines()
+                        time.sleep(0.5)
+                        print(response)
                     logger.info(" Success loaded config file")
                 except:
                     logger.info(" Error loaded configuration file")
@@ -226,7 +227,8 @@ class Board(object):
         if self._is_connected:
             self._motor_position += step * self._motor_direction
             print(self._motor_position)
-            self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
+            self.send_command("G1X{0}".format(step), nonblocking, callback)
+            #self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
 
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False):

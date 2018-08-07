@@ -27,6 +27,15 @@ class Ui_MainWindow(QMainWindow):
         self.delay_between_turns = 1
         self.invert = False
         
+        try:
+            self.configuration = board.read_configuration(self)
+            self.list_rates = self.configuration['Rotational_speed'].keys()
+            #print(list(self.configuration['Rotational_speed'].keys()))
+            #self.list_rates = [x.popitem()[0] for x in self.configuration['Rotational_speed']]
+        except:
+            self.list_rates = ['медленно', 'средне', 'быстро']
+        #print( ll )
+        
         super().__init__()
         self.setupUi(self)
         self.board = board.Board()
@@ -41,10 +50,13 @@ class Ui_MainWindow(QMainWindow):
             
     def ChangeRate_motor(self, rate):
         speed = 750
-        if rate == "Медленная": speed = 750
-        elif rate == "Средняя": speed = 3750
-        elif rate == "Высокая": speed = 7500
-        #self.board._motor_speed = speed
+        try:
+            speed = self.configuration['Rotational_speed'][rate]
+        except:
+            if rate == "медленно": speed = 750
+            elif rate == "средне": speed = 3750
+            elif rate == "быстро": speed = 7500
+            #self.board._motor_speed = speed
         self.board.motor_speed(speed)
 
         
@@ -217,7 +229,7 @@ class Ui_MainWindow(QMainWindow):
         self.RateComboBox.setCurrentText("")
         self.RateComboBox.setMaxVisibleItems(12)
         self.RateComboBox.setObjectName("comboBox")
-        self.RateComboBox.addItems(["Медленная", "Средняя", "Высокая"])
+        self.RateComboBox.addItems(self.list_rates)
         self.RateComboBox.activated[str].connect(self.ChangeRate_motor)
         ## ---
 
