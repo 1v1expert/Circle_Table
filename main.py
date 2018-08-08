@@ -29,7 +29,7 @@ class Ui_MainWindow(QMainWindow):
         
         try:
             self.configuration = board.read_configuration(self)
-            self.list_rates = self.configuration['Rotational_speed'].keys()
+            self.list_rates = self.configuration['Rotational_speed'].keys().encode('cp1251')
             #print(list(self.configuration['Rotational_speed'].keys()))
             #self.list_rates = [x.popitem()[0] for x in self.configuration['Rotational_speed']]
         except:

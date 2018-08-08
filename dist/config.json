@@ -1,13 +1,18 @@
 {
-    "Init_command":[
-      {
-        "command": "M92 X45.3"
-      },
-      {
-        "command": "G92 X0"
-      },
-      {
-        "command": "G91"
-      }
-    ]
+  "Init_command":[
+    {
+      "command": "M92 X45.3"
+    },
+    {
+      "command": "G92 X0"
+    },
+    {
+      "command": "G91"
+    }
+  ],
+  "Rotational_speed": {
+    "медленно": 750,
+    "средне": 3750,
+    "быстро": 7500
+  }
 }

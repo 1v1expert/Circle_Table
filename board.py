@@ -133,7 +133,7 @@ class Board(object):
                 info = self.read(False)
                 print(info)
                 try:
-                    jf_file = read_configuration()
+                    jf_file = read_configuration(self)
                     for cmd in jf_file['Init_command']:
                         self._send_command(cmd['command'])
                         response = self._serial_port.readlines()
