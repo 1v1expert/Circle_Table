@@ -49,15 +49,15 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(False)
             
     def ChangeRate_motor(self, rate):
-        speed = 750
+        self.rate = 750
         try:
-            speed = self.configuration['Rotational_speed'][rate]
+            self.rate = self.configuration['Rotational_speed'][rate]
         except:
-            if rate == "медленно": speed = 750
-            elif rate == "средне": speed = 3750
-            elif rate == "быстро": speed = 7500
+            if rate == "медленно": self.rate = 750
+            elif rate == "средне": self.rate = 3750
+            elif rate == "быстро": self.rate = 7500
             #self.board._motor_speed = speed
-        self.board.motor_speed(speed)
+        self.board.motor_speed(self.rate)
 
         
     def onChanged(self, text):
@@ -110,11 +110,16 @@ class Ui_MainWindow(QMainWindow):
             time.sleep(self.delay_before_start)
             print('motor speed = ', self.board._motor_speed, " steps = ", self.degrees)
             
+            self.board.delay_sends(sec=self.delay_between_turns)
             for rt in range(self.steps):
-                sec = float(self.degrees / self.board._motor_speed)
-                print("sec = ", 10 * sec * 6, " sleep = ", sec + self.delay_between_turns)
-                self.board.motor_move(step=self.degrees)
-                time.sleep(60 * sec + self.delay_between_turns)
+                self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
+               
+            
+            #for rt in range(self.steps):
+            #    sec = float(self.degrees / self.board._motor_speed)
+            #    print("sec = ", 10 * sec * 6, " sleep = ", sec + self.delay_between_turns)
+            #    self.board.motor_move(step=self.degrees)
+            #    time.sleep(60 * sec + self.delay_between_turns)
             
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')

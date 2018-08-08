@@ -189,9 +189,9 @@ class Board(object):
 
     def motor_speed(self, value):
         if self._is_connected:
-            if self._motor_speed != value:
-                self._motor_speed = value
-                self._send_command("G1F{0}".format(value))
+            #if self._motor_speed != value:
+            self._motor_speed = value
+            self._send_command("G1F{0}".format(value))
 
     def motor_acceleration(self, value):
         if self._is_connected:
@@ -211,7 +211,12 @@ class Board(object):
                 time.sleep(1)
                 # Restore speed value
                 self.motor_speed(speed)
-
+    
+    def delay_sends(self, sec=0):
+        if self._is_connected:
+            self._send_command("G4 S{0}".format(sec))
+    
+    
     def motor_disable(self):
         if self._is_connected:
             if self._motor_enabled:
@@ -227,9 +232,12 @@ class Board(object):
         if self._is_connected:
             self._motor_position += step * self._motor_direction
             print(self._motor_position)
-            self.send_command("G1X{0}".format(step), nonblocking, callback)
+            self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
             #self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
-
+    
+    def motor_move_exchange(self, step=0, rate=0, nonblocking=True, callback=True):
+        if self._is_connected:
+            self.send_command("G1X{0}F{1}".format(step, rate), nonblocking, callback)
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False):
         if nonblocking:
