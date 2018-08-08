@@ -15,6 +15,9 @@ import sys
 import comscanner
 import board
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self):
@@ -110,10 +113,12 @@ class Ui_MainWindow(QMainWindow):
             time.sleep(self.delay_before_start)
             print('motor speed = ', self.board._motor_speed, " steps = ", self.degrees)
             
+            logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
             self.board.delay_sends(sec=self.delay_between_turns)
             for rt in range(self.steps):
                 self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
-               
+            logger.info(' FINISH ROTATE ')
+            
             
             #for rt in range(self.steps):
             #    sec = float(self.degrees / self.board._motor_speed)

@@ -256,9 +256,11 @@ class Board(object):
                     self._serial_port.flushInput()
                     self._serial_port.flushOutput()
                     self._serial_port.write(req + "\n".encode('utf-8'))
+                    logger.info('Send serial port command: ', req, '\n'.encode('utf-8'))
                     while req != '~' and req != '!' and ret == '':
                         #ret = self._serial_port.readlines()
                         ret = self.read(read_lines)
+                        logger.info('Request post: ', ret)
                         #self._reset()
                         print('ret = ', ret, 'req=', req)
                         time.sleep(0.01)
