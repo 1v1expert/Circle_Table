@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 system = platform.system()
 
 
-def read_configuration(self):
-    with open('config.json') as jfile:
-        jf_file = json.load(jfile)
+def read_configuration():
+    with open('config.json', 'rb') as jfile:
+        data = jfile.read().decode("utf-8").replace("'", '"')
+        jf_file = json.loads(data)
         return jf_file
 
 class WrongFirmware(Exception):
@@ -53,7 +54,7 @@ class Board(object):
 
     """
 
-    def __init__(self, parent=None, serial_name='', baud_rate=250000):
+    def __init__(self, config, parent=None, serial_name='', baud_rate=250000):
         self.parent = parent
         self.serial_name = serial_name
         self.baud_rate = baud_rate
@@ -69,6 +70,7 @@ class Board(object):
         self._laser_number = 2
         self._laser_enabled = self._laser_number * [False]
         self._tries = 0  # Check if command fails
+        self.configuration = config
     
     def connect(self):
         """Open serial port and perform handshake"""
@@ -80,68 +82,27 @@ class Board(object):
                 logger.info("Try openning serial port on {0}\n".format(system))
                 
                 version = self._serial_port.readlines()
-                logger.info(" Version: ", version)
-                #if version:
-                #    for ver in version:
-                #        if "1.1.0-RC7_3DQ0.2" in ver.decode('utf-8'):
-                #            print('SUCCESS INPLUG')
-                #        else:
-                #            logger.info(" Error connect, not found 1.1.0-RC7_3DQ0.2 in FIRMWARE")
-                #            return False
-                #    logger.info(version)
-                #else:
-                #    return False
-                #info = self.read(True)
-                #print(info)
-                
-                
-                #self._serial_port.write("G1X10".encode('utf-8'))
-                #G1F{0}
-                #version = self._serial_port.readlines()
-                #print(version)
-                #self._serial_port.write("G1F5000".encode('utf-8'))
-                #version = self._serial_port.readlines()
-                #print(version)
-                #self._serial_port.write("G1X100".encode('utf-8'))
-                #while version != "b''":
-                #    version = self._serial_port.readline()
-                #    print(version)
-                #if "Horus 0.1 ['$' for help]" in version.decode('utf-8'):
-                #    raise OldFirmware()
-                # elif "Horus 0.2 ['$' for help]" in version.decode('utf-8'):
-                #if version.decode('utf-8'):
-                #self._reset()  # Force Reset and flush
-                #-----
+                version_msg = "Version: {}".format(version)
+                logger.info(version_msg)
                 time.sleep(2)
                 self.motor_enable()
                 info = self.read(False)
-                print(info)
-                #------
-                #time.sleep(2)
-                #self.motor_move(20)
-                #info = self.read(False)
-                #print(info)
-                #version = self._serial_port.readlines()
-                #for ver in version:
-                #    print(ver.decode('utf-8'))
-                #version = self._serial_port.readline()
-                #print(version)
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
                 time.sleep(2)
                 self.motor_move(step=0)
                 info = self.read(False)
                 print(info)
-                try:
-                    jf_file = read_configuration(self)
-                    for cmd in jf_file['Init_command']:
+                if self.configuration:
+                    for cmd in self.configuration['Init_command']:
+                        msg = "Send init commands: {}".format(cmd['command'])
+                        logger.info(msg)
                         self._send_command(cmd['command'])
                         response = self._serial_port.readlines()
-                        time.sleep(0.5)
-                        print(response)
-                    logger.info(" Success loaded config file")
-                except:
-                    logger.info(" Error loaded configuration file")
+                        time.sleep(0.1)
+                    logger.info("Loading init command, success")
+                else:
+                    logger.error("No find init command")
                 #self._send_command("M92 X45.3")
                 
                 #self._send_command("G92 X0")
@@ -151,8 +112,12 @@ class Board(object):
                 #print(info)
                 # Set current position as origin
                 #self.motor_reset_origin()
-                logger.info(" Done")
-                return True
+                if self._is_connected:
+                    logger.info("Init board DONE")
+                    return True
+                else:
+                    logger.error("ERROR CONNECT TO BOARD")
+                    return False
                 #else:
                     #return False
                     #raise WrongFirmware()
@@ -256,15 +221,22 @@ class Board(object):
                     self._serial_port.flushInput()
                     self._serial_port.flushOutput()
                     self._serial_port.write(req + "\n".encode('utf-8'))
-                    logger.info('Send serial port command: ', req, '\n'.encode('utf-8'))
+                    attempt = 0
                     while req != '~' and req != '!' and ret == '':
+                        if ret =='': attempt += 1
                         #ret = self._serial_port.readlines()
                         ret = self.read(read_lines)
-                        logger.info('Request post: ', ret)
+                        logmsg = 'Send command: {}, request post: {}'.format(req, ret)
+                        logger.info(logmsg)
                         #self._reset()
                         print('ret = ', ret, 'req=', req)
                         time.sleep(0.01)
-                    self._success()
+                        if attempt > 20:
+                            logger.error('Fail, no answer from board')
+                            self._is_connected = False
+                            break
+                    else:
+                        self._success()
                     #ret = self.read(read_lines)
                     print('succes send command')
                 except:

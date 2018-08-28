@@ -20,7 +20,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 class Ui_MainWindow(QMainWindow):
-    def __init__(self):
+    def __init__(self, config):
         self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800',
                       '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
         self.degrees = 10
@@ -29,21 +29,18 @@ class Ui_MainWindow(QMainWindow):
         self.delay_before_start = 0
         self.delay_between_turns = 1
         self.invert = False
-        
-        try:
-            self.configuration = board.read_configuration(self)
-            self.list_rates = self.configuration['Rotational_speed'].keys().encode('cp1251')
-            #print(list(self.configuration['Rotational_speed'].keys()))
-            #self.list_rates = [x.popitem()[0] for x in self.configuration['Rotational_speed']]
-        except:
-            self.list_rates = ['медленно', 'средне', 'быстро']
-        #print( ll )
-        
+        self.configuration = config
+        if self.configuration: self.list_rates = self.configuration['Rotational_speed'].keys()
+        else: self.list_rates = ['медленно', 'средне', 'быстро']
+
+        #self.configuration = board.read_configuration(self)
+        #print(self.configuration['Rotational_speed'].keys())
+        #.encode('cp1251')
         super().__init__()
         self.setupUi(self)
-        self.board = board.Board()
-        
-        
+        self.board = board.Board(config=self.configuration)
+
+        logging.info('Success init app')
         
     def motor_invert(self, choos):
         if choos == 'Инверс':
@@ -66,9 +63,6 @@ class Ui_MainWindow(QMainWindow):
     def onChanged(self, text):
         self.lineEdit.setText(text)
         self.lineEdit.adjustSize()
-        
-    def find_ports(self):
-        comscanner.find_ports()
         
     def Init_board(self):
         comscanner.get_start()
@@ -202,13 +196,13 @@ class Ui_MainWindow(QMainWindow):
         self.groupBox.setGeometry(QtCore.QRect(10, 20, 311, 411))
         self.groupBox.setObjectName("groupBox")
         
-        
-        
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(10, 50, 111, 41))
+        #-- Set Font --
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
+        
         self.label.setFont(font)
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
@@ -242,7 +236,7 @@ class Ui_MainWindow(QMainWindow):
         self.RateComboBox.addItems(self.list_rates)
         self.RateComboBox.activated[str].connect(self.ChangeRate_motor)
         ## ---
-
+        # -- Choose steps degrees --
         self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.ValueStepsSpinBox.setRange(0, 100)
         self.ValueStepsSpinBox.setValue(1)
@@ -381,12 +375,9 @@ class Ui_MainWindow(QMainWindow):
         #self.lineEdit.setInputMask(_translate("MainWindow", "99999"))
         self.label_2.setText(_translate("MainWindow", "Количество шагов:"))
         self.label_3.setText(_translate("MainWindow", "Скорость вращения:"))
-        #self.lineEdit_2.setInputMask(_translate("MainWindow", "99999"))
         self.label_4.setText(_translate("MainWindow", "Задержка перед стартом:"))
         self.label_5.setText(_translate("MainWindow", "Задержка между поворотами:"))
         self.label_6.setText(_translate("MainWindow", "Направление вращения:"))
-        #self.lineEdit_3.setInputMask(_translate("MainWindow", "99999"))
-        #self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
         self.pushButton.setText(_translate("MainWindow", "Старт"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
 
@@ -401,27 +392,5 @@ class myWin(QtWidgets.QMainWindow):
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    
-    
-    #window = QMainWindow()
-    #ss = myWin()
-    #window.show()
-    
     ui = Ui_MainWindow()
-    #ui.setupUi(window)
-    #window.show()
     sys.exit(app.exec_())
-    
-    
-    #app = QtWidgets.QApplication(sys.argv)
-    #myapp = myWin()
-    #myapp.show()
-    #sys.exit(app.exec_())
-
-#app = QApplication(sys.argv)
-#window = QtGui()
-#ui = Ui_MainWindow()
-#ui.setupUi(window)
-#QtCore.QObject.connect(ui.butQuit, QtCore.SIGNAL("clicked()"), QtGui.qApp.quit)
-#window.show()
-#sys.exit(app.exec_())
