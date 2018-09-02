@@ -164,12 +164,18 @@ class Ui_MainWindow(QMainWindow):
         #else:
         self.comboBox_Std_speeds.addItems(self.std_speeds)
         self.comboBox_Std_speeds.activated[str].connect(self.onSetSerialSpeeds)
-        
+
         self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButton.setGeometry(QtCore.QRect(90, 80, 221, 51))
+        self.ConnectButton.setGeometry(QtCore.QRect(10, 70, 180, 51))
         self.ConnectButton.setCheckable(False)
         self.ConnectButton.setObjectName("pushButton")
+        self.ConnectButton.setText(_translate("MainWindow", "Telnet"))
+        self.ConnectButton.clicked.connect(self.onConnectBoard)
         
+        self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
+        self.ConnectButton.setGeometry(QtCore.QRect(220, 70, 180, 51))
+        self.ConnectButton.setCheckable(False)
+        self.ConnectButton.setObjectName("pushButton")
         self.ConnectButton.setText(_translate("MainWindow", "подключить"))
         self.ConnectButton.clicked.connect(self.onConnectBoard)
         

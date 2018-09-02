@@ -15,5 +15,7 @@
     "средне": 3750,
     "быстро": 7500
   },
-  "Delay_command": "G4 S{0}"
+  "Delay_command": "G4 S{0}",
+  "Degrees": 10
+
 }
