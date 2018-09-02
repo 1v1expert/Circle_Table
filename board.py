@@ -12,6 +12,7 @@ import platform
 import serial
 import json
 import logging
+import collections
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +23,8 @@ def read_configuration():
     with open('config.json', 'rb') as jfile:
         data = jfile.read().decode("utf-8").replace("'", '"')
         jf_file = json.loads(data)
-        return jf_file
+        data_restruct = collections.OrderedDict(jf_file)
+        return data_restruct
 
 class WrongFirmware(Exception):
 
