@@ -23,16 +23,21 @@ class Ui_MainWindow(QMainWindow):
     def __init__(self, config):
         self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800',
                       '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
-        self.degrees = 10
-        self.steps = 1
         self.rate = 750
-        self.delay_before_start = 0
-        self.delay_between_turns = 1
         self.invert = False
         self.configuration = config
-        if self.configuration: self.list_rates = self.configuration['Rotational_speed'].keys()
-        else: self.list_rates = ['медленно', 'средне', 'быстро']
-
+        if self.configuration:
+            self.list_rates = self.configuration['Rotational_speed'].keys()
+            self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
+            self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
+            self.steps = self.configuration['Default_settings']['Steps']
+            self.degrees = self.configuration['Default_settings']['Degrees']
+        else:
+            self.list_rates = ['медленно', 'средне', 'быстро']
+            self.delay_before_start = 0
+            self.delay_between_turns = 1
+            self.steps = 1
+            self.degrees = 10
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
         #.encode('cp1251')
@@ -59,7 +64,6 @@ class Ui_MainWindow(QMainWindow):
             #self.board._motor_speed = speed
         self.board.motor_speed(self.rate)
 
-        
     def onChanged(self, text):
         self.lineEdit.setText(text)
         self.lineEdit.adjustSize()
@@ -165,19 +169,19 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_Std_speeds.addItems(self.std_speeds)
         self.comboBox_Std_speeds.activated[str].connect(self.onSetSerialSpeeds)
 
-        self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButton.setGeometry(QtCore.QRect(10, 70, 180, 51))
-        self.ConnectButton.setCheckable(False)
-        self.ConnectButton.setObjectName("pushButton")
-        self.ConnectButton.setText(_translate("MainWindow", "Telnet"))
-        self.ConnectButton.clicked.connect(self.onConnectBoard)
+        self.ConnectButtonTelnet = QtWidgets.QPushButton(self.groupBox)
+        self.ConnectButtonTelnet.setGeometry(QtCore.QRect(10, 70, 180, 51))
+        self.ConnectButtonTelnet.setCheckable(False)
+        self.ConnectButtonTelnet.setObjectName("pushButton")
+        self.ConnectButtonTelnet.setText(_translate("MainWindow", "Telnet"))
+        self.ConnectButtonTelnet.clicked.connect(self.onConnectBoard)
         
-        self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButton.setGeometry(QtCore.QRect(220, 70, 180, 51))
-        self.ConnectButton.setCheckable(False)
-        self.ConnectButton.setObjectName("pushButton")
-        self.ConnectButton.setText(_translate("MainWindow", "подключить"))
-        self.ConnectButton.clicked.connect(self.onConnectBoard)
+        self.ConnectButtonSerial = QtWidgets.QPushButton(self.groupBox)
+        self.ConnectButtonSerial.setGeometry(QtCore.QRect(220, 70, 180, 51))
+        self.ConnectButtonSerial.setCheckable(False)
+        self.ConnectButtonSerial.setObjectName("pushButton")
+        self.ConnectButtonSerial.setText(_translate("MainWindow", "подключить"))
+        self.ConnectButtonSerial.clicked.connect(self.onConnectBoard)
         
         #self.statusBar().showMessage('подключено')
         

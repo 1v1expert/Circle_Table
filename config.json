@@ -15,7 +15,13 @@
     "средне": 3750,
     "быстро": 7500
   },
+  "Default_settings": {
+    "Degrees": 1012,
+    "Steps": 321,
+    "Delay_before_start": 7,
+    "Delay_between_turns": 3
+  },
   "Delay_command": "G4 S{0}",
-  "Degrees": 10
+  "Command_of_rotate": ""
 
 }
