@@ -32,12 +32,14 @@ class Ui_MainWindow(QMainWindow):
             self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
             self.steps = self.configuration['Default_settings']['Steps']
             self.degrees = self.configuration['Default_settings']['Degrees']
+            self.cmd_delay_sends = self.configuration['Delay_command']
         else:
             self.list_rates = ['медленно', 'средне', 'быстро']
             self.delay_before_start = 0
             self.delay_between_turns = 1
             self.steps = 1
             self.degrees = 10
+            self.cmd_delay_sends = "G4 S{0}"
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
         #.encode('cp1251')
@@ -106,24 +108,12 @@ class Ui_MainWindow(QMainWindow):
         
     def Rotate(self):
         if self.board._is_connected:
-            print('Start rotate')
-            #self.board.motor_enable()
             time.sleep(self.delay_before_start)
-            print('motor speed = ', self.board._motor_speed, " steps = ", self.degrees)
-            
             logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
-            self.board.delay_sends(sec=self.delay_between_turns)
+            self.board.delay_sends(self.cmd_delay_sends, sec=self.delay_between_turns)
             for rt in range(self.steps):
                 self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
-            logger.info(' FINISH ROTATE ')
-            
-            
-            #for rt in range(self.steps):
-            #    sec = float(self.degrees / self.board._motor_speed)
-            #    print("sec = ", 10 * sec * 6, " sleep = ", sec + self.delay_between_turns)
-            #    self.board.motor_move(step=self.degrees)
-            #    time.sleep(60 * sec + self.delay_between_turns)
-            
+            logger.info('-----FINISH ROTATE----')
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()
@@ -249,8 +239,8 @@ class Ui_MainWindow(QMainWindow):
         # -- Choose steps degrees --
         self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.ValueStepsSpinBox.setRange(0, 100)
-        self.ValueStepsSpinBox.setValue(1)
-        self.ValueStepsSpinBox.setSingleStep(self.steps)
+        self.ValueStepsSpinBox.setValue(self.steps)
+        self.ValueStepsSpinBox.setSingleStep(1)
         # self.spinBox.setPrefix("текст до (")
         self.ValueStepsSpinBox.setSuffix(" шаг(-а, -ов)")
         self.ValueStepsSpinBox.setGeometry(QtCore.QRect(190, 100, 113, 20))

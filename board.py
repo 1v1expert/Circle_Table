@@ -179,7 +179,7 @@ class Board(object):
                 # Restore speed value
                 self.motor_speed(speed)
     
-    def delay_sends(self, sec=0):
+    def delay_sends(self, cmd, sec=0):
         if self._is_connected:
             self._send_command("G4 S{0}".format(sec))
     

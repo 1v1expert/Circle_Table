@@ -17,7 +17,7 @@
   },
   "Default_settings": {
     "Degrees": 1012,
-    "Steps": 321,
+    "Steps": 20,
     "Delay_before_start": 7,
     "Delay_between_turns": 3
   },
