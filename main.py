@@ -16,6 +16,7 @@ import comscanner
 import board
 import time
 import logging
+import telnetlib
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +79,16 @@ class Ui_MainWindow(QMainWindow):
         
     def onSetSerialSpeeds(self, speed):
         self.board.baud_rate = int(speed)
+    
+    def onConnectBoardTelnet(self):
+        """ Connect device to telnet protocol """
+        tn = telnetlib.Telnet("192.168.1.124", "22")
+        tn.write(b"STATUS\n\n")
+        request = tn.read_all()
+        print(request)
+        tn.write(b"STATUS\n")
+        request = tn.read_all()
+        print(request)
     
     def onConnectBoard(self):
         f_rot = True
@@ -148,26 +159,46 @@ class Ui_MainWindow(QMainWindow):
             self.comboBox_SerialPorts.addItems(['Устройства не найдены'])
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
-        self.comboBox_Std_speeds = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_Std_speeds.setGeometry(QtCore.QRect(300, 25, 120, 22))
-        self.comboBox_Std_speeds.setCurrentText("")
-        self.comboBox_Std_speeds.setMaxVisibleItems(12)
-        self.comboBox_Std_speeds.setObjectName("comboBox_Std_speeds")
-        #if (len(self.board.get_serial_list())):
-        #    self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
-        #else:
-        self.comboBox_Std_speeds.addItems(self.std_speeds)
-        self.comboBox_Std_speeds.activated[str].connect(self.onSetSerialSpeeds)
+        self.comboBox_Std_speeds_board = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_Std_speeds_board.setGeometry(QtCore.QRect(300, 25, 120, 22))
+        self.comboBox_Std_speeds_board.setCurrentText("")
+        self.comboBox_Std_speeds_board.setMaxVisibleItems(12)
+        self.comboBox_Std_speeds_board.setObjectName("comboBox_Std_speeds")
+        self.comboBox_Std_speeds_board.addItems(self.std_speeds)
+        self.comboBox_Std_speeds_board.activated[str].connect(self.onSetSerialSpeeds)
+        
+        self.address_connection = QtWidgets.QLineEdit(self.groupBox)
+        #self.port_connection.setRange(0, 99999)
+        #self.address_connection.setValue("localhost")
+        #self.port_connection.setSingleStep(1)
+        #self.port_connection.setSuffix(" порт")
+        self.address_connection.setInputMask('999.999.999.999')
+        self.address_connection.setText("127.0.0.1")
+        self.address_connection.setGeometry(QtCore.QRect(65, 55, 131, 22))
+        #self.port_connection.valueChanged[int].connect(self.Changedelay_between_turns)
+        self.address_connection.setVisible(True)
+        
+        self.port_connection = QtWidgets.QSpinBox(self.groupBox)
+        self.port_connection.setRange(0, 99999)
+        self.port_connection.setValue(22)
+        self.port_connection.setSingleStep(1)
+        self.port_connection.setSuffix(" порт")
+        self.port_connection.setGeometry(QtCore.QRect(310, 55, 80, 22))
+        self.port_connection.valueChanged[int].connect(self.Changedelay_between_turns)
+        self.port_connection.setVisible(True)
+
+        self.flo = QtWidgets.QFormLayout()
+        self.flo.addRow("integer validator", self.port_connection)
 
         self.ConnectButtonTelnet = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButtonTelnet.setGeometry(QtCore.QRect(10, 70, 180, 51))
+        self.ConnectButtonTelnet.setGeometry(QtCore.QRect(10, 80, 180, 51))
         self.ConnectButtonTelnet.setCheckable(False)
         self.ConnectButtonTelnet.setObjectName("pushButton")
         self.ConnectButtonTelnet.setText(_translate("MainWindow", "Telnet"))
-        self.ConnectButtonTelnet.clicked.connect(self.onConnectBoard)
+        self.ConnectButtonTelnet.clicked.connect(self.onConnectBoardTelnet)
         
         self.ConnectButtonSerial = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButtonSerial.setGeometry(QtCore.QRect(220, 70, 180, 51))
+        self.ConnectButtonSerial.setGeometry(QtCore.QRect(220, 80, 180, 51))
         self.ConnectButtonSerial.setCheckable(False)
         self.ConnectButtonSerial.setObjectName("pushButton")
         self.ConnectButtonSerial.setText(_translate("MainWindow", "подключить"))
@@ -176,7 +207,9 @@ class Ui_MainWindow(QMainWindow):
         #self.statusBar().showMessage('подключено')
         
         self.modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        #self.modalWindow.setLayout(self.flo)
         self.modalWindow.move(self.geometry().center() - self.modalWindow.rect().center() - QtCore.QPoint(100, 50))
+        
         self.modalWindow.show()
         
     def setupUi(self, MainWindow):
