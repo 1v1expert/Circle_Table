@@ -35,6 +35,7 @@ except:
 install_locale('pronterface')
 from plugins import PRINTCORE_HANDLER
 
+logger = logging.getLogger(__name__)
 
 def locked(f):
     @wraps(f)

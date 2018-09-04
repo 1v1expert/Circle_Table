@@ -82,13 +82,26 @@ class Ui_MainWindow(QMainWindow):
     
     def onConnectBoardTelnet(self):
         """ Connect device to telnet protocol """
-        tn = telnetlib.Telnet("192.168.1.124", "22")
-        tn.write(b"STATUS\n\n")
-        request = tn.read_all()
-        print(request)
-        tn.write(b"STATUS\n")
-        request = tn.read_all()
-        print(request)
+        #tn = telnetlib.Telnet("192.168.1.124", "22")
+        #tn.write(b"STATUS\n\n")
+        #request = tn.read_all()
+        text = self.port_connection.text()
+        text_after = ""
+        for char in text:
+            try: a_char = int(char)
+            except: a_char = char
+            if isinstance(a_char, int):
+                text_after += str(a_char)
+        dest = self.address_connection.text() + ":" + text_after
+        # --- Start princore\
+        import printcore
+        p = printcore.printcore(dest, 250000)
+        p.connect(port=dest, baud=250000)
+        p.disconnect()
+        print(dest)
+        #tn.write(b"STATUS\n")
+        #request = tn.read_all()
+        #print(request)
     
     def onConnectBoard(self):
         f_rot = True
