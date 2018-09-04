@@ -86,19 +86,19 @@ class Ui_MainWindow(QMainWindow):
         #tn.write(b"STATUS\n\n")
         #request = tn.read_all()
         text = self.port_connection.text()
-        text_after = ""
-        for char in text:
-            try: a_char = int(char)
-            except: a_char = char
-            if isinstance(a_char, int):
-                text_after += str(a_char)
-        dest = self.address_connection.text() + ":" + text_after
+        #text_after = ""
+        #for char in text:
+        #    try: a_char = int(char)
+        #    except: a_char = char
+        #    if isinstance(a_char, int):
+        #        text_after += str(a_char)
+        ports = [port for port in text.split() if port.isdigit()]
+        dest = self.address_connection.text() + ":" + ports[0]
         # --- Start princore\
         import printcore
         p = printcore.printcore(dest, 250000)
         p.connect(port=dest, baud=250000)
         p.disconnect()
-        print(dest)
         #tn.write(b"STATUS\n")
         #request = tn.read_all()
         #print(request)
