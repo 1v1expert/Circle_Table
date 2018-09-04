@@ -133,6 +133,7 @@ class Board(object):
             self.printer_tcp.connect((self.serial_name, self.baud_rate))
             self.printer_tcp.settimeout(self.timeout)
             self.printer = self.printer_tcp.makefile()
+            print(self.printer_tcp, "\n----\n", self.printer)
         except socket.error as e:
             if (e.strerror is None): e.strerror = ""
             logger.error(_("Could not connect to %s:%s:") % (self.serial_name, self.baud_rate) + "\n" + _(

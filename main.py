@@ -168,11 +168,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_Std_speeds_board.activated[str].connect(self.onSetSerialSpeeds)
         
         self.address_connection = QtWidgets.QLineEdit(self.groupBox)
-        #self.port_connection.setRange(0, 99999)
-        #self.address_connection.setValue("localhost")
-        #self.port_connection.setSingleStep(1)
-        #self.port_connection.setSuffix(" порт")
-        self.address_connection.setInputMask('999.999.999.999')
+        self.address_connection.setInputMask('090.090.090.090')
         self.address_connection.setText("127.0.0.1")
         self.address_connection.setGeometry(QtCore.QRect(65, 55, 131, 22))
         #self.port_connection.valueChanged[int].connect(self.Changedelay_between_turns)
@@ -203,8 +199,6 @@ class Ui_MainWindow(QMainWindow):
         self.ConnectButtonSerial.setObjectName("pushButton")
         self.ConnectButtonSerial.setText(_translate("MainWindow", "подключить"))
         self.ConnectButtonSerial.clicked.connect(self.onConnectBoard)
-        
-        #self.statusBar().showMessage('подключено')
         
         self.modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
         #self.modalWindow.setLayout(self.flo)

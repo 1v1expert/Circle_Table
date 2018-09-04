@@ -1,0 +1,1 @@
+PRINTCORE_HANDLER = []
