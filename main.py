@@ -75,6 +75,7 @@ class Ui_MainWindow(QMainWindow):
         comscanner.get_start()
 
     def onSetSerial(self, serial_name):
+        print(serial_name)
         self.board.serial_name = serial_name
         
     def onSetSerialSpeeds(self, speed):
@@ -92,6 +93,8 @@ class Ui_MainWindow(QMainWindow):
         #    except: a_char = char
         #    if isinstance(a_char, int):
         #        text_after += str(a_char)
+        if self.comboBox_SerialPorts.lineEdit():
+            print(self.comboBox_SerialPorts.currentText())
         ports = [port for port in text.split() if port.isdigit()]
         dest = self.address_connection.text() + ":" + ports[0]
         # --- Start princore\
@@ -166,6 +169,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_SerialPorts.setCurrentText("")
         self.comboBox_SerialPorts.setMaxVisibleItems(12)
         self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
+        self.comboBox_SerialPorts.setEditable(True)
         if (len(self.board.get_serial_list())):
             self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
         else:
@@ -177,6 +181,7 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_Std_speeds_board.setCurrentText("")
         self.comboBox_Std_speeds_board.setMaxVisibleItems(12)
         self.comboBox_Std_speeds_board.setObjectName("comboBox_Std_speeds")
+        #self.comboBox_Std_speeds_board.setEditable(True)
         self.comboBox_Std_speeds_board.addItems(self.std_speeds)
         self.comboBox_Std_speeds_board.activated[str].connect(self.onSetSerialSpeeds)
         
