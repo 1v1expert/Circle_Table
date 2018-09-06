@@ -107,9 +107,9 @@ class Ui_MainWindow(QMainWindow):
         dest = self.address_connection.text() + ":" + ports[0]
         # --- Start princore\
         import printcore
-        p = printcore.printcore(dest, 250000)
-        p.connect(port=dest, baud=250000)
-        p.disconnect()
+        p = printcore.printcore(dest)
+        p.connect()
+        #p.disconnect()
         #tn.write(b"STATUS\n")
         #request = tn.read_all()
         #print(request)

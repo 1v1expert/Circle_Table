@@ -35,7 +35,9 @@ except:
 install_locale('pronterface')
 from plugins import PRINTCORE_HANDLER
 
-logger = logging.getLogger(__name__)
+logging.basicConfig(filename='3dcircle.log',
+                    format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
+                    level=logging.DEBUG)
 
 def locked(f):
     @wraps(f)
@@ -131,18 +133,19 @@ class printcore():
         self.event_handler.append(handler)
     
     def logError(self, error):
-        for handler in self.event_handler:
-            try:
-                handler.on_error(error)
-            except:
-                logging.error(traceback.format_exc())
-        if self.errorcb:
-            try:
-                self.errorcb(error)
-            except:
-                logging.error(traceback.format_exc())
-        else:
-            logging.error(error)
+        logging.error(error)
+        #for handler in self.event_handler:
+        #    try:
+        #        handler.on_error(error)
+        #    except:
+        #        logging.error(traceback.format_exc())
+        #if self.errorcb:
+        #    try:
+        #        self.errorcb(error)
+        #    except:
+        #        logging.error(traceback.format_exc())
+        #else:
+        #    logging.error(error)
     
     @locked
     def disconnect(self):
@@ -690,7 +693,7 @@ class printcore():
             except:
                 logging.warning(_("Could not analyze command %s:") % command + "\n" + traceback.format_exc())
             if self.loud:
-                logging.info("SENT: %s" % command)
+                logging.info("Sent: %s" % command)
             
             for handler in self.event_handler:
                 try:
@@ -703,8 +706,8 @@ class printcore():
                 except:
                     self.logError(traceback.format_exc())
             try:
-                self.printer.write((command + "\n"))
-                #self.printer.write((command + "\n").encode('ascii'))
+                #self.printer.write((command + "\n"))
+                self.printer.write((command + "\n").encode('ascii'))
                 if self.printer_tcp:
                     try:
                         self.printer.flush()
