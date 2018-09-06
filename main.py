@@ -28,19 +28,19 @@ class Ui_MainWindow(QMainWindow):
         self.invert = False
         self.configuration = config
         if self.configuration:
-            self.list_rates = self.configuration['Rotational_speed'].keys()
-            self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
-            self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
-            self.steps = self.configuration['Default_settings']['Steps']
-            self.degrees = self.configuration['Default_settings']['Degrees']
-            self.cmd_delay_sends = self.configuration['Delay_command']
+            try:
+                self.list_rates = self.configuration['Rotational_speed'].keys()
+                self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
+                self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
+                self.steps = self.configuration['Default_settings']['Steps']
+                self.degrees = self.configuration['Default_settings']['Degrees']
+                self.cmd_delay_sends = self.configuration['Delay_command']
+            except:
+                logging.error("No loaded configuration")
+                self.def_settings()
         else:
-            self.list_rates = ['медленно', 'средне', 'быстро']
-            self.delay_before_start = 0
-            self.delay_between_turns = 1
-            self.steps = 1
-            self.degrees = 10
-            self.cmd_delay_sends = "G4 S{0}"
+            logging.error("No loaded configuration")
+            self.def_settings()
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
         #.encode('cp1251')
@@ -49,6 +49,14 @@ class Ui_MainWindow(QMainWindow):
         self.board = board.Board(config=self.configuration)
 
         logging.info('Success init app')
+
+    def def_settings(self):
+        self.list_rates = ['медленно', 'средне', 'быстро']
+        self.delay_before_start = 0
+        self.delay_between_turns = 1
+        self.steps = 1
+        self.degrees = 10
+        self.cmd_delay_sends = "G4 S{0}"
         
     def motor_invert(self, choos):
         if choos == 'Инверс':
