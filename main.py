@@ -110,7 +110,7 @@ class Ui_MainWindow(QMainWindow):
         import printcore
         try:
             self.p = printcore.printcore(self.dest)
-            self.p.connect()
+            self.p.connect(port=self.dest)
             self.is_socket = True
         except:
             self.statusBar().showMessage('Не удалось подключиться по {}'.format(self.dest))
