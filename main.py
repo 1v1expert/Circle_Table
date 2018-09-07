@@ -27,6 +27,7 @@ class Ui_MainWindow(QMainWindow):
         self.rate = 750
         self.invert = False
         self.configuration = config
+        self.is_socket = False
         if self.configuration:
             try:
                 self.list_rates = self.configuration['Rotational_speed'].keys()
@@ -104,11 +105,16 @@ class Ui_MainWindow(QMainWindow):
         if self.comboBox_SerialPorts.lineEdit():
             print(self.comboBox_SerialPorts.currentText())
         ports = [port for port in text.split() if port.isdigit()]
-        dest = self.address_connection.text() + ":" + ports[0]
+        self.dest = self.address_connection.text() + ":" + ports[0]
         # --- Start princore\
         import printcore
-        p = printcore.printcore(dest)
-        p.connect()
+        try:
+            self.p = printcore.printcore(self.dest)
+            self.p.connect()
+            self.is_socket = True
+        except:
+            self.statusBar().showMessage('Не удалось подключиться по {}'.format(self.dest))
+        self.modalWindow.close()
         #p.disconnect()
         #tn.write(b"STATUS\n")
         #request = tn.read_all()
@@ -142,17 +148,25 @@ class Ui_MainWindow(QMainWindow):
         self.delay_between_turns = sec
         
     def Rotate(self):
-        if self.board._is_connected:
-            time.sleep(self.delay_before_start)
-            logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
-            self.board.delay_sends(self.cmd_delay_sends, sec=self.delay_between_turns)
-            for rt in range(self.steps):
-                self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
-            logger.info('-----FINISH ROTATE----')
+        if not self.is_socket:
+            if self.board._is_connected:
+                time.sleep(self.delay_before_start)
+                logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
+                self.board.delay_sends(self.cmd_delay_sends, sec=self.delay_between_turns)
+                for rt in range(self.steps):
+                    self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
+                logger.info('-----FINISH ROTATE----')
+            else:
+                self.statusBar().showMessage('Ошибка! Нет подключения')
+                self.show_modal_window()
         else:
-            self.statusBar().showMessage('Ошибка! Нет подключения')
-            self.show_modal_window()
-            
+            if self.p.printer:
+                self.p.send_now("G4 S{0}".format(self.delay_between_turns))
+                for rt in range(self.steps):
+                    self.p.send_now("G1X{0}F{1}".format(self.degrees, self.rate))
+                logger.info('-----FINISH ROTATE----')
+            else:
+                self.statusBar().showMessage('Ошибка! Нет подключения к {}'.format(self.dest))
     def show_modal_window(self):
         global modalWindow
         _translate = QtCore.QCoreApplication.translate
