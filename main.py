@@ -112,6 +112,7 @@ class Ui_MainWindow(QMainWindow):
             self.p = printcore.printcore(self.dest)
             self.p.connect(port=self.dest)
             self.is_socket = True
+            self.statusBar().showMessage('Подключено успешно по telnet')
         except:
             self.statusBar().showMessage('Не удалось подключиться по {}'.format(self.dest))
         self.modalWindow.close()
