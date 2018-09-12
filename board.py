@@ -250,7 +250,7 @@ class Board(object):
                         #self._reset()
                         print('ret = ', ret, 'req=', req)
                         time.sleep(0.01)
-                        if attempt > 20:
+                        if attempt > 100:
                             logger.error('Fail, no answer from board')
                             self._is_connected = False
                             break
