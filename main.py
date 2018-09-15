@@ -28,36 +28,29 @@ class Ui_MainWindow(QMainWindow):
         self.invert = False
         self.configuration = config
         self.is_socket = False
-        if self.configuration:
-            try:
-                self.list_rates = self.configuration['Rotational_speed'].keys()
-                self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
-                self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
-                self.steps = self.configuration['Default_settings']['Steps']
-                self.degrees = self.configuration['Default_settings']['Degrees']
-                self.cmd_delay_sends = self.configuration['Delay_command']
-            except:
-                logging.error("No loaded configuration")
-                self.def_settings()
-        else:
-            logging.error("No loaded configuration")
-            self.def_settings()
+        self.board = board.Board(config=self.configuration)
+        # if self.configuration:
+        #     try:
+        #         self.list_rates = self.configuration['Rotational_speed'].keys()
+        #         self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
+        #         self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
+        #         self.steps = self.configuration['Default_settings']['Steps']
+        #         self.degrees = self.configuration['Default_settings']['Degrees']
+        #         self.cmd_delay_sends = self.configuration['Delay_command']
+        #     except:
+        #         logging.error("No loaded configuration")
+        #         self.def_settings()
+        # else:
+        #     logging.error("No loaded configuration")
+        #     self.def_settings()
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
         #.encode('cp1251')
         super().__init__()
         self.setupUi(self)
-        self.board = board.Board(config=self.configuration)
+        
 
         logging.info('Success init app')
-
-    def def_settings(self):
-        self.list_rates = ['медленно', 'средне', 'быстро']
-        self.delay_before_start = 0
-        self.delay_between_turns = 1
-        self.steps = 1
-        self.degrees = 10
-        self.cmd_delay_sends = "G4 S{0}"
         
     def motor_invert(self, choos):
         if choos == 'Инверс':
@@ -153,7 +146,7 @@ class Ui_MainWindow(QMainWindow):
             if self.board._is_connected:
                 time.sleep(self.delay_before_start)
                 logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
-                self.board.delay_sends(self.cmd_delay_sends, sec=self.delay_between_turns)
+                self.board.delay_sends(sec=self.delay_between_turns)
                 for rt in range(self.steps):
                     self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
                 logger.info('-----FINISH ROTATE----')
@@ -277,7 +270,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.DegreesSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.DegreesSpinBox.setRange(0, 1000)
-        self.DegreesSpinBox.setValue(self.degrees)
+        self.DegreesSpinBox.setValue(self.board.degrees)
         self.DegreesSpinBox.setSingleStep(5)
         #self.spinBox.setPrefix("текст до (")
         self.DegreesSpinBox.setSuffix(" градусов")
@@ -301,13 +294,13 @@ class Ui_MainWindow(QMainWindow):
         self.RateComboBox.setCurrentText("")
         self.RateComboBox.setMaxVisibleItems(12)
         self.RateComboBox.setObjectName("comboBox")
-        self.RateComboBox.addItems(self.list_rates)
+        self.RateComboBox.addItems(self.board.list_rates)
         self.RateComboBox.activated[str].connect(self.ChangeRate_motor)
         ## ---
         # -- Choose steps degrees --
         self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.ValueStepsSpinBox.setRange(0, 100)
-        self.ValueStepsSpinBox.setValue(self.steps)
+        self.ValueStepsSpinBox.setValue(self.board.steps)
         self.ValueStepsSpinBox.setSingleStep(1)
         # self.spinBox.setPrefix("текст до (")
         self.ValueStepsSpinBox.setSuffix(" шаг(-а, -ов)")
@@ -345,7 +338,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.Delay_between_turns = QtWidgets.QSpinBox(self.groupBox)
         self.Delay_between_turns.setRange(0, 1000)
-        self.Delay_between_turns.setValue(self.delay_between_turns)
+        self.Delay_between_turns.setValue(self.board.delay_between_turns)
         self.Delay_between_turns.setSingleStep(10)
         self.Delay_between_turns.setSuffix(" c")
         self.Delay_between_turns.setGeometry(QtCore.QRect(190, 240, 113, 20))
@@ -354,7 +347,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.Delay_before_start = QtWidgets.QSpinBox(self.groupBox)
         self.Delay_before_start.setRange(0, 1000)
-        self.Delay_before_start.setValue(self.delay_before_start)
+        self.Delay_before_start.setValue(self.board.delay_before_start)
         self.Delay_before_start.setSingleStep(10)
         self.Delay_before_start.setSuffix(" c")
         self.Delay_before_start.setGeometry(QtCore.QRect(190, 190, 113, 20))

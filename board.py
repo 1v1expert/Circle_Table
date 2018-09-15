@@ -48,15 +48,7 @@ class OldFirmware(Exception):
 
 class Board(object):
 
-    """Board class. For accessing to the scanner board
-
-    Gcode commands:
-
-        G1 Fnnn : feed rate
-        G1 Xnnn : move motor
-        G50     : reset origin position
-
-    """
+    """Board class. For accessing to the scanner board"""
 
     def __init__(self, config, parent=None, serial_name='', baud_rate=250000):
         self.parent = parent
@@ -71,10 +63,9 @@ class Board(object):
         self._motor_speed = 750
         self._motor_acceleration = 0
         self._motor_direction = 1
-        self._laser_number = 2
-        self._laser_enabled = self._laser_number * [False]
         self._tries = 0  # Check if command fails
         self.configuration = config
+        self.load_configuration()
     
     def connect_serial(self):
         """Open serial port and perform handshake"""
@@ -85,39 +76,30 @@ class Board(object):
             if self._serial_port.isOpen():
                 logger.info("Try openning serial port on {0}\n".format(system))
                 version = self._serial_port.readlines()
-                version_msg = "Version: {}".format(version)
-                logger.info(version_msg)
-                time.sleep(2)
-                self.motor_enable()
-                info = self.read(False)
+                #version_msg = "Version: {}".format(version)
+                logger.info(version)
+                #time.sleep(2)
+                #self.motor_enable()
+                #info = self.read(False)
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
-                time.sleep(2)
-                self.motor_move(step=0)
-                info = self.read(False)
-                print(info)
-                if self.configuration:
-                    for cmd in self.configuration['Init_command']:
-                        msg = "Send init commands: {}".format(cmd['command'])
-                        logger.info(msg)
-                        self._send_command(cmd['command'])
-                        response = self._serial_port.readlines()
-                        time.sleep(0.1)
-                    logger.info("Loading init command, success")
-                else:
-                    logger.error("No find init command")
-                if self._is_connected:
-                    logger.info("Init board DONE")
-                    return True
-                else:
-                    logger.error("ERROR CONNECT TO BOARD")
-                    return False  # else:  # return False  # raise WrongFirmware()
+                #time.sleep(2)
+                #self.motor_move(step=0)
+                #info = self.read(False)
+                #print(info)
+                self.init_load_conf()
             else:
                 raise BoardNotConnected()
         except Exception as exception:
             logger.error("Error opening the port {0}\n".format(self.serial_name))
             self._serial_port = None
             return False  # raise exception
+        if self._is_connected:
+            logger.info("Init board done")
+            return True
+        else:
+            logger.error("ERROR CONNECTING TO BOARD")
+            return False  # else:  # return False  # raise WrongFirmware()
     
     def connect_socket(self):
         """Open socket port and perform handshake"""
@@ -147,7 +129,49 @@ class Board(object):
             self.connect_serial()
         else:
             self.connect_socket()
-
+    
+    def load_configuration(self):
+        if self.configuration:
+            try:
+                self.rotation_speeds = collections.OrderedDict(self.configuration['Rotational_speed'])
+                self.list_rates = self.rotation_speeds.keys()
+                self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
+                self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
+                self.steps = self.configuration['Default_settings']['Steps']
+                self.degrees = self.configuration['Default_settings']['Degrees']
+                self.cmd_delay_sends = self.configuration['Delay_command']
+                self.use_delay_command = self.configuration['Use_delay_command']
+                self.ini_commands = self.configuration['Init_command']
+                self.use_init_command = self.configuration['Use_init_command']
+            except:
+                logging.error("No loaded configuration from file")
+                self.def_settings()
+        else:
+            logging.error("No loaded configuration from file")
+            self.def_settings()
+            
+    def def_settings(self):
+        self.list_rates = ['медленно', 'средне', 'быстро']
+        self.delay_before_start = 0
+        self.delay_between_turns = 1
+        self.steps = 1
+        self.degrees = 10
+        self.ini_commands = []
+        self.cmd_delay_sends = "G4 S{0}"
+        self.use_delay_command = False
+        self.use_init_command = False
+        
+    def init_load_conf(self):
+        try:
+            if len(self.ini_commands) > 0 and self.use_init_command:
+                for cmd in self.ini_commands:
+                    command = cmd.values() # No sure there
+                    self._send_command(command)
+            else:
+                logger.info('No find configuration or not command for init command')
+        except:
+            logger.error('Error load init configuration commands')
+            
     def disconnect(self):
         """Close serial port"""
         if self._is_connected:
@@ -196,16 +220,9 @@ class Board(object):
                 # Restore speed value
                 self.motor_speed(speed)
     
-    def delay_sends(self, cmd, sec=0):
-        if self._is_connected:
-            self._send_command("G4 S{0}".format(sec))
-    
-    
-    def motor_disable(self):
-        if self._is_connected:
-            if self._motor_enabled:
-                self._motor_enabled = False
-                self._send_command("M18")
+    def delay_sends(self, sec=0):
+        if self._is_connected and self.use_delay_command:
+            self._send_command(self.cmd_delay_sends.format(sec))
 
     def motor_reset_origin(self):
         if self._is_connected:
@@ -221,7 +238,8 @@ class Board(object):
     
     def motor_move_exchange(self, step=0, rate=0, nonblocking=True, callback=True):
         if self._is_connected:
-            self.send_command("G1X{0}F{1}".format(step, rate), nonblocking, callback)
+            self._motor_position = step * self._motor_direction
+            self.send_command("G1X{0}F{1}".format(self._motor_position, rate), nonblocking, callback)
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False):
         if nonblocking:
