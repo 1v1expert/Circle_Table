@@ -61,9 +61,7 @@ class Ui_MainWindow(QMainWindow):
         self.rate = 750
         try:
             for key in self.configuration['Rotational_speed']:
-                if key.get(rate): print(key.get(rate))
-            #print(self.rate)
-            #self.rate = self.configuration['Rotational_speed'][rate]
+                if key.get(rate): self.rate = key.get(rate)
         except:
             if rate == "медленно": self.rate = 750
             elif rate == "средне": self.rate = 3750

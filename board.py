@@ -140,8 +140,6 @@ class Board(object):
                 for keys in self.configuration['Rotational_speed']:
                     for key in keys.keys():
                         self.list_rates.append(key)
-                #print([value.keys() for value in self.configuration['Rotational_speed']])
-                #print(collections.OrderedDict(self.configuration['Rotational_speed']))
                 self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
                 self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
                 self.steps = self.configuration['Default_settings']['Steps']
