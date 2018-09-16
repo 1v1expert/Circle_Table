@@ -13,7 +13,7 @@ import printcore
 
 logging.basicConfig(filename='3dcircle.log',
                     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
-                    level=logging.DEBUG)
+                    level=logging.INFO)
 
 if __name__=='__main__':
     app = QApplication(sys.argv)

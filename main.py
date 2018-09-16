@@ -22,8 +22,7 @@ logger = logging.getLogger(__name__)
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, config):
-        self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800',
-                      '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
+        self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']  # Скорость COM порта
         self.rate = 750
         self.invert = False
         self.configuration = config
@@ -61,7 +60,10 @@ class Ui_MainWindow(QMainWindow):
     def ChangeRate_motor(self, rate):
         self.rate = 750
         try:
-            self.rate = self.configuration['Rotational_speed'][rate]
+            for key in self.configuration['Rotational_speed']:
+                if key.get(rate): print(key.get(rate))
+            #print(self.rate)
+            #self.rate = self.configuration['Rotational_speed'][rate]
         except:
             if rate == "медленно": self.rate = 750
             elif rate == "средне": self.rate = 3750
