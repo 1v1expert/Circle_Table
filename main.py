@@ -203,7 +203,7 @@ class Ui_MainWindow(QMainWindow):
         
         self.address_connection = QtWidgets.QLineEdit(self.groupBox)
         self.address_connection.setInputMask('090.090.090.090')
-        self.address_connection.setText("127.0.0.1")
+        self.address_connection.setText(self.board.host_ip)
         self.address_connection.setGeometry(QtCore.QRect(65, 55, 131, 22))
         #self.port_connection.valueChanged[int].connect(self.Changedelay_between_turns)
         self.address_connection.setVisible(True)
@@ -243,9 +243,9 @@ class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
         
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(500, 500)
-        MainWindow.setMinimumSize(QtCore.QSize(550, 500))
-        MainWindow.setMaximumSize(QtCore.QSize(550, 500))
+        MainWindow.resize(self.board.width_window, self.board.height_window)
+        MainWindow.setMinimumSize(QtCore.QSize(self.board.width_window, self.board.height_window))
+        MainWindow.setMaximumSize(QtCore.QSize(self.board.width_window, self.board.height_window))
         #MainWindow.setWindowOpacity(0.0)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)

@@ -148,6 +148,14 @@ class Board(object):
                 self.use_delay_command = self.configuration['Use_delay_command']
                 self.ini_commands = self.configuration['Init_command']
                 self.use_init_command = self.configuration['Use_init_command']
+                #Size main window
+                self.width_window = self.configuration['Width_window']
+                self.height_window = self.configuration['Height_window']
+                # Set host ip
+                self.host_ip = self.configuration['Host_ip']
+                # Set position coordinate
+                self.coordinate_absolute = self.configuration['Coordinate_absolute']
+                
             except:
                 logging.error("No loaded configuration from file")
                 self.def_settings()
@@ -165,6 +173,13 @@ class Board(object):
         self.cmd_delay_sends = "G4 S{0}"
         self.use_delay_command = False
         self.use_init_command = False
+        # Size main window
+        self.width_window = 550
+        self.height_window = 500
+        # Set host ip
+        self.host_ip = "127.0.0.1"
+        # Set position coordinate
+        self.coordinate_absolute = False
         
     def init_load_conf(self):
         try:
@@ -244,8 +259,11 @@ class Board(object):
     
     def motor_move_exchange(self, step=0, rate=0, nonblocking=True, callback=True):
         if self._is_connected:
-            self._motor_position = step * self._motor_direction
-            self.send_command("G1X{0}F{1}".format(self._motor_position, rate), nonblocking, callback)
+            if self.coordinate_absolute:
+                self._motor_position += step * self._motor_direction
+                self.send_command("G1X{0}F{1}".format(self._motor_position, rate), nonblocking, callback)
+            else:
+                self.send_command("G1X{0}F{1}".format(step * self._motor_direction, rate), nonblocking, callback)
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False):
         if nonblocking:
