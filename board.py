@@ -126,15 +126,16 @@ class Board(object):
 
     def connect(self):
         if self.is_serial:
-            self.connect_serial()
+            return self.connect_serial()
         else:
-            self.connect_socket()
+            return self.connect_socket()
     
     def load_configuration(self):
         if self.configuration:
             try:
                 self.rotation_speeds = collections.OrderedDict(self.configuration['Rotational_speed'])
                 self.list_rates = self.rotation_speeds.keys()
+                print(collections.OrderedDict(self.configuration['Rotational_speed']))
                 self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
                 self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
                 self.steps = self.configuration['Default_settings']['Steps']
@@ -165,8 +166,9 @@ class Board(object):
         try:
             if len(self.ini_commands) > 0 and self.use_init_command:
                 for cmd in self.ini_commands:
-                    command = cmd.values() # No sure there
+                    command = cmd['command'] # No sure there
                     self._send_command(command)
+                    print(command, ' -Succes send init command') 
             else:
                 logger.info('No find configuration or not command for init command')
         except:
