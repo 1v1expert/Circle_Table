@@ -136,15 +136,15 @@ class Ui_MainWindow(QMainWindow):
         self.steps = step
     
     def ChangeDelay_before_start(self, sec):
-        self.delay_before_start = sec
+        self.board.delay_before_start = sec
     
     def Changedelay_between_turns(self, sec):
-        self.delay_between_turns = sec
+        self.board.delay_between_turns = sec
         
     def Rotate(self):
         if not self.is_socket:
             if self.board._is_connected:
-                time.sleep(self.delay_before_start)
+                time.sleep(self.board.delay_before_start)
                 logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
                 self.board.delay_sends(sec=self.delay_between_turns)
                 for rt in range(self.steps):
