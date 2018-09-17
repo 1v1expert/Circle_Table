@@ -146,7 +146,7 @@ class Ui_MainWindow(QMainWindow):
             if self.board._is_connected:
                 time.sleep(self.board.delay_before_start)
                 logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
-                self.board.delay_sends(sec=self.delay_between_turns)
+                self.board.delay_sends(sec=self.board.delay_between_turns)
                 for rt in range(self.steps):
                     self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
                 logger.info('-----FINISH ROTATE----')
