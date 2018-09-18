@@ -133,7 +133,7 @@ class Ui_MainWindow(QMainWindow):
         self.degrees = degree
         
     def changeSteps(self, step):
-        self.steps = step
+        self.board.steps = step
     
     def ChangeDelay_before_start(self, sec):
         self.board.delay_before_start = sec
@@ -145,9 +145,9 @@ class Ui_MainWindow(QMainWindow):
         if not self.is_socket:
             if self.board._is_connected:
                 time.sleep(self.board.delay_before_start)
-                logger.info(' START ROTATE, ', self.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
+                logger.info(' START ROTATE, ', self.board.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
                 self.board.delay_sends(sec=self.board.delay_between_turns)
-                for rt in range(self.steps):
+                for rt in range(self.board.steps):
                     self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
                 logger.info('-----FINISH ROTATE----')
             else:
@@ -156,7 +156,7 @@ class Ui_MainWindow(QMainWindow):
         else:
             if self.p.printer:
                 self.p.send_now("G4 S{0}".format(self.delay_between_turns))
-                for rt in range(self.steps):
+                for rt in range(self.board.steps):
                     self.p.send_now("G1X{0}F{1}".format(self.degrees, self.rate))
                 logger.info('-----FINISH ROTATE----')
             else:
