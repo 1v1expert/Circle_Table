@@ -34,7 +34,7 @@ class Ui_MainWindow(QMainWindow):
         #         self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
         #         self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
         #         self.steps = self.configuration['Default_settings']['Steps']
-        #         self.degrees = self.configuration['Default_settings']['Degrees']
+        #         self.board.degrees = self.configuration['Default_settings']['Degrees']
         #         self.cmd_delay_sends = self.configuration['Delay_command']
         #     except:
         #         logging.error("No loaded configuration")
@@ -130,7 +130,7 @@ class Ui_MainWindow(QMainWindow):
         self.modalWindow.close()
     
     def changeDegrees(self, degree):
-        self.degrees = degree
+        self.board.degrees = degree
         
     def changeSteps(self, step):
         self.board.steps = step
@@ -145,10 +145,10 @@ class Ui_MainWindow(QMainWindow):
         if not self.is_socket:
             if self.board._is_connected:
                 time.sleep(self.board.delay_before_start)
-                logger.info(' START ROTATE, ', self.board.steps, '- circle, ', 'step - ', self.degrees, ', rate - ', self.rate)
+                logger.info(' START ROTATE, ', self.board.steps, '- circle, ', 'step - ', self.board.degrees, ', rate - ', self.rate)
                 self.board.delay_sends(sec=self.board.delay_between_turns)
                 for rt in range(self.board.steps):
-                    self.board.motor_move_exchange(step=self.degrees, rate=self.rate)
+                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.rate)
                 logger.info('-----FINISH ROTATE----')
             else:
                 self.statusBar().showMessage('Ошибка! Нет подключения')
@@ -157,7 +157,7 @@ class Ui_MainWindow(QMainWindow):
             if self.p.printer:
                 self.p.send_now("G4 S{0}".format(self.delay_between_turns))
                 for rt in range(self.board.steps):
-                    self.p.send_now("G1X{0}F{1}".format(self.degrees, self.rate))
+                    self.p.send_now("G1X{0}F{1}".format(self.board.degrees, self.rate))
                 logger.info('-----FINISH ROTATE----')
             else:
                 self.statusBar().showMessage('Ошибка! Нет подключения к {}'.format(self.dest))
