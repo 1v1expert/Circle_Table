@@ -187,7 +187,8 @@ class Board(object):
                 for cmd in self.ini_commands:
                     command = cmd['command'] # No sure there
                     self._send_command(command)
-                    print(command, ' -Succes send init command')
+                    response = self._serial_port.readlines()
+                    print(command, ' -Succes send init command, response: ', response)
             else:
                 logger.info('No find configuration or not command for init command')
         except:
