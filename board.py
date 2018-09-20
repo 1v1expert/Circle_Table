@@ -152,6 +152,8 @@ class Board(object):
                 #Size main window
                 self.width_window = self.configuration['Width_window']
                 self.height_window = self.configuration['Height_window']
+                # Set command roatet
+                self.command_of_rotate = self.configuration['Command_of_rotate']
                 # Set host ip
                 self.host_ip = self.configuration['Host_ip']
                 # Set position coordinate
@@ -172,6 +174,7 @@ class Board(object):
         self.degrees = 10
         self.ini_commands = []
         self.cmd_delay_sends = "G4 S{0}"
+        self.command_of_rotate = "G1X{0}F{1}"
         self.use_delay_command = False
         self.use_init_command = False
         # Size main window
@@ -264,9 +267,9 @@ class Board(object):
             self.set_attempt = step/rate * 60
             if self.coordinate_absolute:
                 self._motor_position += step * self._motor_direction
-                self.send_command("G1X{0}F{1}".format(self._motor_position, rate), nonblocking, callback, False, self.set_attempt)
+                self.send_command(self.command_of_rotate.format(self._motor_position, rate), nonblocking, callback, False, self.set_attempt)
             else:
-                self.send_command("G1X{0}F{1}".format(step * self._motor_direction, rate), nonblocking, callback, False, self.set_attempt)
+                self.send_command(self.command_of_rotate.format(step * self._motor_direction, rate), nonblocking, callback, False, self.set_attempt)
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False, attempt=0.0):
         if nonblocking:
@@ -275,7 +278,7 @@ class Board(object):
         else:
             self._send_command(req, attempt, callback, read_lines)
 
-    def _send_command(self, req, set_attempt, callback=None, read_lines=False):
+    def _send_command(self, req, set_attempt=0.0, callback=None, read_lines=False):
         """Sends the request and returns the response"""
         ret = ''
         req = req.encode('utf-8')
