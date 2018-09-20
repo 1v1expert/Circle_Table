@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 class Ui_MainWindow(QMainWindow):
     def __init__(self, config):
         self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']  # Скорость COM порта
-        self.rate = 750
+        
         self.invert = False
         self.configuration = config
         self.is_socket = False
@@ -58,16 +58,16 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(False)
             
     def ChangeRate_motor(self, rate):
-        self.rate = 750
+        self.board.rate = 750
         try:
             for key in self.configuration['Rotational_speed']:
-                if key.get(rate): self.rate = key.get(rate)
+                if key.get(rate): self.board.rate = key.get(rate)
         except:
-            if rate == "медленно": self.rate = 750
-            elif rate == "средне": self.rate = 3750
-            elif rate == "быстро": self.rate = 7500
+            if rate == "медленно": self.board.rate = 750
+            elif rate == "средне": self.board.rate = 3750
+            elif rate == "быстро": self.board.rate = 7500
             #self.board._motor_speed = speed
-        self.board.motor_speed(self.rate)
+        self.board.motor_speed(self.board.rate)
 
     def onChanged(self, text):
         self.lineEdit.setText(text)
@@ -145,10 +145,10 @@ class Ui_MainWindow(QMainWindow):
         if not self.is_socket:
             if self.board._is_connected:
                 time.sleep(self.board.delay_before_start)
-                logger.info(' START ROTATE, ', self.board.steps, '- circle, ', 'step - ', self.board.degrees, ', rate - ', self.rate)
+                logger.info(' START ROTATE, ', self.board.steps, '- circle, ', 'step - ', self.board.degrees, ', rate - ', self.board.rate)
                 self.board.delay_sends(sec=self.board.delay_between_turns)
                 for rt in range(self.board.steps):
-                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.rate)
+                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
                 logger.info('-----FINISH ROTATE----')
             else:
                 self.statusBar().showMessage('Ошибка! Нет подключения')
@@ -157,7 +157,7 @@ class Ui_MainWindow(QMainWindow):
             if self.p.printer:
                 self.p.send_now("G4 S{0}".format(self.delay_between_turns))
                 for rt in range(self.board.steps):
-                    self.p.send_now("G1X{0}F{1}".format(self.board.degrees, self.rate))
+                    self.p.send_now("G1X{0}F{1}".format(self.board.degrees, self.board.rate))
                 logger.info('-----FINISH ROTATE----')
             else:
                 self.statusBar().showMessage('Ошибка! Нет подключения к {}'.format(self.dest))

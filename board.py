@@ -66,6 +66,7 @@ class Board(object):
         self._tries = 0  # Check if command fails
         self.configuration = config
         self.load_configuration()
+        self.rate = 750
     
     def connect_serial(self):
         """Open serial port and perform handshake"""
@@ -260,20 +261,21 @@ class Board(object):
     
     def motor_move_exchange(self, step=0, rate=0, nonblocking=True, callback=True):
         if self._is_connected:
+            self.set_attempt = step/rate * 60
             if self.coordinate_absolute:
                 self._motor_position += step * self._motor_direction
-                self.send_command("G1X{0}F{1}".format(self._motor_position, rate), nonblocking, callback)
+                self.send_command("G1X{0}F{1}".format(self._motor_position, rate), nonblocking, callback, False, self.set_attempt)
             else:
-                self.send_command("G1X{0}F{1}".format(step * self._motor_direction, rate), nonblocking, callback)
+                self.send_command("G1X{0}F{1}".format(step * self._motor_direction, rate), nonblocking, callback, False, self.set_attempt)
 
-    def send_command(self, req, nonblocking=False, callback=None, read_lines=False):
+    def send_command(self, req, nonblocking=False, callback=None, read_lines=False, attempt=0.0):
         if nonblocking:
             threading.Thread(target=self._send_command,
-                             args=(req, callback, read_lines)).start()
+                             args=(req, attempt, callback, read_lines)).start()
         else:
-            self._send_command(req, callback, read_lines)
+            self._send_command(req, attempt, callback, read_lines)
 
-    def _send_command(self, req, callback=None, read_lines=False):
+    def _send_command(self, req, set_attempt, callback=None, read_lines=False):
         """Sends the request and returns the response"""
         ret = ''
         req = req.encode('utf-8')
@@ -284,19 +286,25 @@ class Board(object):
                     self._serial_port.flushOutput()
                     self._serial_port.write(req + "\n".encode('utf-8'))
                     attempt = 0
+                    print('Set_attempt -', set_attempt/0.01)
                     while req != '~' and req != '!' and ret == '':
                         if ret =='': attempt += 1
                         #ret = self._serial_port.readlines()
                         ret = self.read(read_lines)
                         logmsg = 'Send command: {}, request post: {}'.format(req, ret)
                         logger.info(logmsg)
-                        #self._reset()
-                        print('ret = ', ret, 'req=', req)
+                        print('Attempt: ', attempt, ', ret = ', ret, ', req=', req)
                         time.sleep(0.01)
-                        if attempt > 100:
-                            logger.error('Fail, no answer from board')
-                            self._is_connected = False
-                            break
+                        if set_attempt:
+                            if attempt > set_attempt:
+                                logger.error('Fail, no answer from board')
+                                self._is_connected = False
+                                break
+                        else:
+                            if attempt > 100:
+                                logger.error('Fail, no answer from board')
+                                self._is_connected = False
+                                break
                     else:
                         self._success()
                     #ret = self.read(read_lines)
