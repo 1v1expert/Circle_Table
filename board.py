@@ -296,7 +296,7 @@ class Board(object):
                         print('Attempt: ', attempt, ', ret = ', ret, ', req=', req)
                         time.sleep(0.01)
                         if set_attempt:
-                            if attempt > set_attempt:
+                            if attempt > set_attempt/0.01:
                                 logger.error('Fail, no answer from board')
                                 self._is_connected = False
                                 break
