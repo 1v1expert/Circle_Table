@@ -147,7 +147,7 @@ class Board(object):
                 self.degrees = self.configuration['Default_settings']['Degrees']
                 self.cmd_delay_sends = self.configuration['Delay_command']
                 self.use_delay_command = self.configuration['Use_delay_command']
-                self.ini_commands = self.configuration['Init_command']
+                self.init_commands = self.configuration['Init_command']
                 self.use_init_command = self.configuration['Use_init_command']
                 #Size main window
                 self.width_window = self.configuration['Width_window']
@@ -158,7 +158,8 @@ class Board(object):
                 self.host_ip = self.configuration['Host_ip']
                 # Set position coordinate
                 self.coordinate_absolute = self.configuration['Coordinate_absolute']
-                
+                # Set Baudrate
+                self.baudrate = self.configuration['Baudrate']
             except:
                 logging.error("No loaded configuration from file")
                 self.def_settings()
@@ -172,7 +173,7 @@ class Board(object):
         self.delay_between_turns = 1
         self.steps = 1
         self.degrees = 10
-        self.ini_commands = []
+        self.init_commands = []
         self.cmd_delay_sends = "G4 S{0}"
         self.command_of_rotate = "G1X{0}F{1}"
         self.use_delay_command = False
@@ -184,11 +185,12 @@ class Board(object):
         self.host_ip = "127.0.0.1"
         # Set position coordinate
         self.coordinate_absolute = False
+        self.baudrate = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']
         
     def init_load_conf(self):
         try:
-            if len(self.ini_commands) > 0 and self.use_init_command:
-                for cmd in self.ini_commands:
+            if len(self.init_commands) > 0 and self.use_init_command:
+                for cmd in self.init_commands:
                     command = cmd['command'] # No sure there
                     self._send_command(command)
                     response = self._serial_port.readlines()

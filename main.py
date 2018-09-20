@@ -22,12 +22,11 @@ logger = logging.getLogger(__name__)
 
 class Ui_MainWindow(QMainWindow):
     def __init__(self, config):
-        self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']  # Скорость COM порта
-        
         self.invert = False
         self.configuration = config
         self.is_socket = False
         self.board = board.Board(config=self.configuration)
+        self.std_speeds = self.board.baudrate # Скорость COM порта
         # if self.configuration:
         #     try:
         #         self.list_rates = self.configuration['Rotational_speed'].keys()

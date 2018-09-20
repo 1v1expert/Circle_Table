@@ -27,6 +27,15 @@
     "Delay_before_start": 7,
     "Delay_between_turns": 3
   },
+  "Baudrate": [
+    "250000",
+    "115200",
+    "57600",
+    "38400",
+    "19200",
+    "9600",
+    "4800"
+  ],
   "Width_window": 550,
   "Height_window": 500,
   "Host_ip": "127.0.0.1",
