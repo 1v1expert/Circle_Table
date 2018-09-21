@@ -66,7 +66,7 @@ class Ui_MainWindow(QMainWindow):
             elif rate == "средне": self.board.rate = 3750
             elif rate == "быстро": self.board.rate = 7500
             #self.board._motor_speed = speed
-        self.board.motor_speed(self.board.rate)
+        #self.board.motor_speed(self.board.rate)
 
     def onChanged(self, text):
         self.lineEdit.setText(text)

@@ -160,6 +160,7 @@ class Board(object):
                 self.coordinate_absolute = self.configuration['Coordinate_absolute']
                 # Set Baudrate
                 self.baudrate = self.configuration['Baudrate']
+                self.baud_rate = self.baudrate[0]
             except:
                 logging.error("No loaded configuration from file")
                 self.def_settings()
@@ -185,6 +186,7 @@ class Board(object):
         self.host_ip = "127.0.0.1"
         # Set position coordinate
         self.coordinate_absolute = False
+        # Set Baudrate
         self.baudrate = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']
         
     def init_load_conf(self):
