@@ -147,10 +147,10 @@ class Ui_MainWindow(QMainWindow):
         if not self.is_socket:
             if self.board._is_connected:
                 time.sleep(self.board.delay_before_start)
-                self.board.delay_sends(sec=self.board.delay_between_turns)
                 self.testApp()
                 for rt in range(self.board.steps):
                     self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                    self.board.delay_sends(sec=self.board.delay_between_turns)
                 logger.info('-----FINISH ROTATE----')
             else:
                 self.statusBar().showMessage('Ошибка! Нет подключения')
