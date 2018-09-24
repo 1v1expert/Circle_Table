@@ -255,7 +255,7 @@ class Board(object):
     
     def delay_sends(self, sec=0):
         if self._is_connected and self.use_delay_command:
-            self._send_command(self.cmd_delay_sends.format(sec))
+            self.send_command(self.cmd_delay_sends.format(sec), True, True, False, 0.0)
 
     def motor_reset_origin(self):
         if self._is_connected:
@@ -265,7 +265,6 @@ class Board(object):
     def motor_move(self, step=0, nonblocking=True, callback=True):
         if self._is_connected:
             self._motor_position += step * self._motor_direction
-            print(self._motor_position)
             self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
             #self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
     
@@ -322,8 +321,6 @@ class Board(object):
                 except:
                     print("False send command")
                     if hasattr(self, '_serial_port'):
-                        if callback is not None:
-                            callback(ret)
                         self._fail()
         if callback is not None:
             print(ret)
