@@ -212,7 +212,6 @@ class Board(object):
             logger.info("Disconnecting board {0}".format(self.serial_name))
             try:
                 if self._serial_port is not None:
-                    self.motor_disable()
                     self._is_connected = False
                     self._serial_port.close()
                     del self._serial_port
@@ -275,9 +274,9 @@ class Board(object):
             self.set_attempt = step/rate * 60
             if self.coordinate_absolute:
                 self._motor_position += step * self._motor_direction
-                self.send_command(self.command_of_rotate.format(self._motor_position, rate), nonblocking, callback, False, self.set_attempt)
+                self.send_command(self.command_of_rotate.format(self._motor_position, self.rate), nonblocking, callback, False, self.set_attempt)
             else:
-                self.send_command(self.command_of_rotate.format(step * self._motor_direction, rate), nonblocking, callback, False, self.set_attempt)
+                self.send_command(self.command_of_rotate.format(step * self._motor_direction, self.rate), nonblocking, callback, False, self.set_attempt)
 
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False, attempt=0.0):
         if nonblocking:

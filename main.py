@@ -46,8 +46,8 @@ class Ui_MainWindow(QMainWindow):
         #.encode('cp1251')
         super().__init__()
         self.setupUi(self)
+        self.testApp()
         
-
         logging.info('Success init app')
         
     def motor_invert(self, choos):
@@ -55,7 +55,10 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(True)
         else:
             self.board.motor_invert(False)
-            
+    
+    def testApp(self):
+        print('Rate - {0}, Steps - {1}, Degrees - {2}'.format(self.board.rate, self.board.steps, self.board.degrees))
+        
     def ChangeRate_motor(self, rate):
         #self.board.rate = 750
         try:
@@ -144,8 +147,8 @@ class Ui_MainWindow(QMainWindow):
         if not self.is_socket:
             if self.board._is_connected:
                 time.sleep(self.board.delay_before_start)
-                logger.info(' START ROTATE, ', self.board.steps, '- circle, ', 'step - ', self.board.degrees, ', rate - ', self.board.rate)
                 self.board.delay_sends(sec=self.board.delay_between_turns)
+                self.testApp()
                 for rt in range(self.board.steps):
                     self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
                 logger.info('-----FINISH ROTATE----')
