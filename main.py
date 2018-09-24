@@ -57,7 +57,7 @@ class Ui_MainWindow(QMainWindow):
             self.board.motor_invert(False)
             
     def ChangeRate_motor(self, rate):
-        self.board.rate = 750
+        #self.board.rate = 750
         try:
             for key in self.configuration['Rotational_speed']:
                 if key.get(rate): self.board.rate = key.get(rate)

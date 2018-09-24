@@ -66,7 +66,7 @@ class Board(object):
         self._tries = 0  # Check if command fails
         self.configuration = config
         self.load_configuration()
-        self.rate = 750
+        #self.rate = 750
     
     def connect_serial(self):
         """Open serial port and perform handshake"""
@@ -161,6 +161,8 @@ class Board(object):
                 # Set Baudrate
                 self.baudrate = self.configuration['Baudrate']
                 self.baud_rate = self.baudrate[0]
+                # Set rate motor
+                self.rate = [rate for rate in self.configuration['Rotational_speed'][0].values()][0]
             except:
                 logging.error("No loaded configuration from file")
                 self.def_settings()
@@ -188,6 +190,8 @@ class Board(object):
         self.coordinate_absolute = False
         # Set Baudrate
         self.baudrate = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']
+        # Set rate motor
+        self.rate = 750
         
     def init_load_conf(self):
         try:
