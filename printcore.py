@@ -169,8 +169,8 @@ class printcore():
             try:
                 line = self.printer.readline()
                 print(line)
-                if self.printer_tcp and not line:
-                    raise OSError(-1, "Read EOF from socket")
+                #if self.printer_tcp and not line:
+                #    raise OSError(-1, "Read EOF from socket")
             except socket.timeout:
                 return ""
             
@@ -184,12 +184,12 @@ class printcore():
                 if self.loud: print("RECV: ", line.rstrip())
             return line
         except SelectError as e:
-            if 'Bad file descriptor' in e.args[0]:
-                print("Can't read from printer (disconnected?) (SelectError {0}): {1}".format(e.errno, e.strerror))
-                return None
-            else:
-                print("SelectError ({0}): {1}".format(e.errno, e.strerror))
-                raise
+            #if 'Bad file descriptor' in e.args[0]:
+            #    print("Can't read from printer (disconnected?) (SelectError {0}): {1}".format(e.errno, e.strerror))
+            #    return None
+            #else:
+            #    print("SelectError ({0}): {1}".format(e.errno, e.strerror))
+            #    raise
         except SerialException as e:
             print("Can't read from printer (disconnected?) (SerialException): {0}".format(e))
             return None
