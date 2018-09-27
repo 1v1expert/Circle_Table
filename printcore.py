@@ -12,10 +12,11 @@ import time, getopt, sys
 import platform, os, traceback
 import socket
 import re
-from functools import wraps
+from functools import wraps, reduce
 from collections import deque
 from GCodeAnalyzer import GCodeAnalyzer
 import gcoder
+
 
 
 def locked(f):
@@ -136,8 +137,7 @@ class printcore():
                     self.printer_tcp.settimeout(self.timeout)
                     self.printer = self.printer_tcp.makefile()
                 except socket.error:
-                    print
-                    _("Could not connect to %s:%s:") % (hostname, port)
+                    print(("Could not connect to %s:%s:") % (hostname, port))
                     self.printer = None
                     self.printer_tcp = None
                     traceback.print_exc()
@@ -148,8 +148,7 @@ class printcore():
                 try:
                     self.printer = Serial(port=self.port, baudrate=self.baud, timeout=0.25)
                 except SerialException:
-                    print
-                    _("Could not connect to %s at baudrate %s:") % (self.port, self.baud)
+                    print(("Could not connect to %s at baudrate %s:") % (self.port, self.baud))
                     self.printer = None
                     traceback.print_exc()
                     return
@@ -181,29 +180,23 @@ class printcore():
                         self.recvcb(line)
                     except:
                         pass
-                if self.loud: print
-                "RECV: ", line.rstrip()
+                if self.loud: print("RECV: ", line.rstrip())
             return line
         except SelectError as e:
             if 'Bad file descriptor' in e.args[1]:
-                print
-                "Can't read from printer (disconnected?) (SelectError {0}): {1}".format(e.errno, e.strerror)
+                print("Can't read from printer (disconnected?) (SelectError {0}): {1}".format(e.errno, e.strerror))
                 return None
             else:
-                print
-                "SelectError ({0}): {1}".format(e.errno, e.strerror)
+                print("SelectError ({0}): {1}".format(e.errno, e.strerror))
                 raise
         except SerialException as e:
-            print
-            "Can't read from printer (disconnected?) (SerialException): {0}".format(e)
+            print("Can't read from printer (disconnected?) (SerialException): {0}".format(e))
             return None
         except socket.error as e:
-            print
-            "Can't read from printer (disconnected?) (Socket error {0}): {1}".format(e.errno, e.strerror)
+            print("Can't read from printer (disconnected?) (Socket error {0}): {1}".format(e.errno, e.strerror))
             return None
         except OSError as e:
-            print
-            "Can't read from printer (disconnected?) (OS Error {0}): {1}".format(e.errno, e.strerror)
+            print("Can't read from printer (disconnected?) (OS Error {0}): {1}".format(e.errno, e.strerror))
             return None
     
     def _listen_can_continue(self):
