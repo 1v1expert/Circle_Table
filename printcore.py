@@ -168,6 +168,7 @@ class printcore():
         try:
             try:
                 line = self.printer.readline()
+                print(line)
                 if self.printer_tcp and not line:
                     raise OSError(-1, "Read EOF from socket")
             except socket.timeout:
