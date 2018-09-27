@@ -27,20 +27,7 @@ class Ui_MainWindow(QMainWindow):
         self.is_socket = False
         self.board = board.Board(config=self.configuration)
         self.std_speeds = self.board.baudrate # Скорость COM порта
-        # if self.configuration:
-        #     try:
-        #         self.list_rates = self.configuration['Rotational_speed'].keys()
-        #         self.delay_before_start = self.configuration['Default_settings']['Delay_before_start']
-        #         self.delay_between_turns = self.configuration['Default_settings']['Delay_between_turns']
-        #         self.steps = self.configuration['Default_settings']['Steps']
-        #         self.board.degrees = self.configuration['Default_settings']['Degrees']
-        #         self.cmd_delay_sends = self.configuration['Delay_command']
-        #     except:
-        #         logging.error("No loaded configuration")
-        #         self.def_settings()
-        # else:
-        #     logging.error("No loaded configuration")
-        #     self.def_settings()
+        self.check_open_ports()
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
         #.encode('cp1251')
@@ -50,8 +37,17 @@ class Ui_MainWindow(QMainWindow):
         
         logging.info('Success init app')
         
-    def motor_invert(self, choos):
-        if choos == 'Инверс':
+    def check_open_ports(self):
+        self.is_open_port = True
+        if not self.board.serial_name:
+            if (len(self.board.get_serial_list())):
+                self.board.serial_name = self.board.get_serial_list()[0]
+            else:
+                self.is_open_port = False
+                self.statusBar().showMessage('Нет доступного порта')
+
+    def motor_invert(self, choose):
+        if choose == 'Инверс':
             self.board.motor_invert(True)
         else:
             self.board.motor_invert(False)
@@ -60,7 +56,6 @@ class Ui_MainWindow(QMainWindow):
         print('Rate - {0}, Steps - {1}, Degrees - {2}'.format(self.board.rate, self.board.steps, self.board.degrees))
         
     def ChangeRate_motor(self, rate):
-        #self.board.rate = 750
         try:
             for key in self.configuration['Rotational_speed']:
                 if key.get(rate): self.board.rate = key.get(rate)
@@ -79,7 +74,6 @@ class Ui_MainWindow(QMainWindow):
         comscanner.get_start()
 
     def onSetSerial(self, serial_name):
-        print(serial_name)
         self.board.serial_name = serial_name
         
     def onSetSerialSpeeds(self, speed):
@@ -98,34 +92,14 @@ class Ui_MainWindow(QMainWindow):
         #    if isinstance(a_char, int):
         #        text_after += str(a_char)
         if self.comboBox_SerialPorts.lineEdit():
-            print(self.comboBox_SerialPorts.currentText())
+            print('LINEEDIT-', self.comboBox_SerialPorts.currentText())
         ports = [port for port in text.split() if port.isdigit()]
         self.dest = self.address_connection.text() + ":" + ports[0]
         # --- Start princore\
-        import printcore
-        try:
-            self.p = printcore.printcore(self.dest)
-            self.p.connect(port=self.dest)
-            self.is_socket = True
-            self.statusBar().showMessage('Подключено успешно по telnet')
-        except:
-            self.statusBar().showMessage('Не удалось подключиться по {}'.format(self.dest))
-        self.modalWindow.close()
-        #p.disconnect()
-        #tn.write(b"STATUS\n")
-        #request = tn.read_all()
-        #print(request)
+        print(self.dest)
     
     def onConnectBoard(self):
-        f_rot = True
-        if not self.board.serial_name:
-            if (len(self.board.get_serial_list())):
-                self.board.serial_name = self.board.get_serial_list()[0]
-            else:
-                f_rot = False
-                self.statusBar().showMessage('Нет доступного порта')
-                
-        if self.board.connect() and f_rot:
+        if self.board.connect() and self.is_open_port:
             self.statusBar().showMessage('Подключено')
         else:
             self.statusBar().showMessage('Не удалось подключиться')
@@ -144,26 +118,18 @@ class Ui_MainWindow(QMainWindow):
         self.board.delay_between_turns = sec
         
     def Rotate(self):
-        if not self.is_socket:
-            if self.board._is_connected:
-                time.sleep(self.board.delay_before_start)
-                self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
-                self.testApp()
-                for rt in range(self.board.steps):
-                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
-                    self.board.delay_sends(sec=self.board.delay_between_turns)
-                logger.info('-----FINISH ROTATE----')
-            else:
-                self.statusBar().showMessage('Ошибка! Нет подключения')
-                self.show_modal_window()
+        if self.board._is_connected:
+            time.sleep(self.board.delay_before_start)
+            self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
+            self.testApp()
+            for rt in range(self.board.steps):
+                self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                self.board.delay_sends(sec=self.board.delay_between_turns)
+            logger.info('-----FINISH ROTATE----')
         else:
-            if self.p.printer:
-                self.p.send_now("G4 S{0}".format(self.delay_between_turns))
-                for rt in range(self.board.steps):
-                    self.p.send_now("G1X{0}F{1}".format(self.board.degrees, self.board.rate))
-                logger.info('-----FINISH ROTATE----')
-            else:
-                self.statusBar().showMessage('Ошибка! Нет подключения к {}'.format(self.dest))
+            self.statusBar().showMessage('Ошибка! Нет подключения')
+            self.show_modal_window()
+            
     def show_modal_window(self):
         global modalWindow
         _translate = QtCore.QCoreApplication.translate

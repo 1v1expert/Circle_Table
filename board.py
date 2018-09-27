@@ -106,24 +106,7 @@ class Board(object):
         """Open socket port and perform handshake"""
         logger.info("Connecting board {0} {1}".format(self.serial_name, self.baud_rate))
         self._is_connected = False
-        # Connect to socket if "port" is an IP, device if not
-        #host_regexp = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$")
-        self.printer_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.printer_tcp.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
-        self.timeout = 0.25
-        self.printer_tcp.settimeout(1.0)
-        try:
-            self.printer_tcp.connect((self.serial_name, self.baud_rate))
-            self.printer_tcp.settimeout(self.timeout)
-            self.printer = self.printer_tcp.makefile()
-            print(self.printer_tcp, "\n----\n", self.printer)
-        except socket.error as e:
-            if (e.strerror is None): e.strerror = ""
-            logger.error(_("Could not connect to %s:%s:") % (self.serial_name, self.baud_rate) + "\n" + _(
-                "Socket error %s:") % e.errno + "\n" + e.strerror)
-            self.printer = None
-            self.printer_tcp = None
-            return
+        
 
     def connect(self):
         if self.is_serial:
