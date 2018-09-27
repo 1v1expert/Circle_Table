@@ -14,8 +14,8 @@ import socket
 import re
 from functools import wraps
 from collections import deque
-from printrun.GCodeAnalyzer import GCodeAnalyzer
-from printrun import gcoder
+from GCodeAnalyzer import GCodeAnalyzer
+import gcoder
 
 
 def locked(f):
