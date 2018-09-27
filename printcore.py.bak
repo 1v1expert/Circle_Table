@@ -137,7 +137,7 @@ class printcore():
                     self.printer_tcp.settimeout(self.timeout)
                     self.printer = self.printer_tcp.makefile()
                 except socket.error:
-                    print((("Could not connect to %s:%s:") % (hostname, port)))
+                    print(("Could not connect to %s:%s:") % (hostname, port))
                     self.printer = None
                     self.printer_tcp = None
                     traceback.print_exc()
@@ -148,7 +148,7 @@ class printcore():
                 try:
                     self.printer = Serial(port=self.port, baudrate=self.baud, timeout=0.25)
                 except SerialException:
-                    print((("Could not connect to %s at baudrate %s:") % (self.port, self.baud)))
+                    print(("Could not connect to %s at baudrate %s:") % (self.port, self.baud))
                     self.printer = None
                     traceback.print_exc()
                     return
@@ -181,10 +181,10 @@ class printcore():
                         self.recvcb(line)
                     except:
                         pass
-                if self.loud: print(("RECV: ", line.rstrip()))
+                if self.loud: print("RECV: ", line.rstrip())
             return line
         except SelectError as e:
-            print(("SelectError ({0}): {1}".format(e.errno, e.strerror)))
+            print("SelectError ({0}): {1}".format(e.errno, e.strerror))
             #if 'Bad file descriptor' in e.args[0]:
             #    print("Can't read from printer (disconnected?) (SelectError {0}): {1}".format(e.errno, e.strerror))
             #    return None
@@ -192,13 +192,13 @@ class printcore():
             #    print("SelectError ({0}): {1}".format(e.errno, e.strerror))
             #    raise
         except SerialException as e:
-            print(("Can't read from printer (disconnected?) (SerialException): {0}".format(e)))
+            print("Can't read from printer (disconnected?) (SerialException): {0}".format(e))
             return None
         except socket.error as e:
-            print(("Can't read from printer (disconnected?) (Socket error {0}): {1}".format(e.errno, e.strerror)))
+            print("Can't read from printer (disconnected?) (Socket error {0}): {1}".format(e.errno, e.strerror))
             return None
         except OSError as e:
-            print(("Can't read from printer (disconnected?) (OS Error {0}): {1}".format(e.errno, e.strerror)))
+            print("Can't read from printer (disconnected?) (OS Error {0}): {1}".format(e.errno, e.strerror))
             return None
     
     def _listen_can_continue(self):
@@ -278,7 +278,7 @@ class printcore():
         self.clear = True
     
     def _checksum(self, command):
-        return reduce(lambda x, y: x ^ y, list(map(ord, command)))
+        return reduce(lambda x, y: x ^ y, map(ord, command))
     
     def startprint(self, gcode, startindex=0):
         """Start a print, gcode is an array of gcode commands.
@@ -503,7 +503,7 @@ class printcore():
             self.sent.append(command)
             self.analyzer.Analyze(command)  # run the command through the analyzer
             if self.loud:
-                print(("SENT: ", command))
+                print("SENT: ", command)
             if self.sendcb:
                 try:
                     self.sendcb(command)
@@ -513,11 +513,11 @@ class printcore():
                 self.printer.write(str(command + "\n"))
                 self.printer.flush()
             except socket.error as e:
-                print(("Can't write to printer (disconnected?) (Socket error {0}): {1}".format(e.errno, e.strerror)))
+                print("Can't write to printer (disconnected?) (Socket error {0}): {1}".format(e.errno, e.strerror))
             except SerialException as e:
-                print(("Can't write to printer (disconnected?) (SerialException): {0}".format(e)))
+                print("Can't write to printer (disconnected?) (SerialException): {0}".format(e))
             except RuntimeError as e:
-                print(("Socket connection broken, disconnected. ({0}): {1}".format(e.errno, e.strerror)))
+                print("Socket connection broken, disconnected. ({0}): {1}".format(e.errno, e.strerror))
 
 
 if __name__ == '__main__':
@@ -527,7 +527,7 @@ if __name__ == '__main__':
     try:
         opts, args = getopt.getopt(sys.argv[1:], "h,b:,v,s", ["help", "baud", "verbose", "statusreport"])
     except getopt.GetoptError:
-        print((sys.exit(2)))
+        print(sys.exit(2))
     for o, a in opts:
         if o in ('-h', '--help'):
             # FIXME: Fix help
@@ -543,7 +543,7 @@ if __name__ == '__main__':
     if len(args) > 1:
         port = args[-2]
         filename = args[-1]
-        print(("Printing: %s on %s with baudrate %d" % (filename, port, baud)))
+        print("Printing: %s on %s with baudrate %d" % (filename, port, baud))
     else:
         print("Usage: python [-h|-b|-v|-s] printcore.py /dev/tty[USB|ACM]x filename.gcode")
         sys.exit(2)
