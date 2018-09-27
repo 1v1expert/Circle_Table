@@ -262,7 +262,7 @@ class GCode(object):
             old_lines += cur_lines
             layers[prev_z] = old_lines
         
-        for idx in list(layers.keys()):
+        for idx in layers.keys():
             cur_lines = layers[idx]
             has_movement = False
             for l in layers[idx]:
@@ -384,18 +384,18 @@ class GCode(object):
 
 def main():
     if len(sys.argv) < 2:
-        print(("usage: %s filename.gcode" % sys.argv[0]))
+        print("usage: %s filename.gcode" % sys.argv[0])
         return
     
     gcode = GCode(open(sys.argv[1]))
     
     print("Dimensions:")
-    print(("\tX: %0.02f - %0.02f (%0.02f)" % (gcode.xmin, gcode.xmax, gcode.width)))
-    print(("\tY: %0.02f - %0.02f (%0.02f)" % (gcode.ymin, gcode.ymax, gcode.depth)))
-    print(("\tZ: %0.02f - %0.02f (%0.02f)" % (gcode.zmin, gcode.zmax, gcode.height)))
-    print(("Filament used: %0.02fmm" % gcode.filament_length))
-    print(("Number of layers: %d" % gcode.num_layers()))
-    print(("Estimated duration: %s" % gcode.estimate_duration()))
+    print("\tX: %0.02f - %0.02f (%0.02f)" % (gcode.xmin, gcode.xmax, gcode.width))
+    print("\tY: %0.02f - %0.02f (%0.02f)" % (gcode.ymin, gcode.ymax, gcode.depth))
+    print("\tZ: %0.02f - %0.02f (%0.02f)" % (gcode.zmin, gcode.zmax, gcode.height))
+    print("Filament used: %0.02fmm" % gcode.filament_length)
+    print("Number of layers: %d" % gcode.num_layers())
+    print("Estimated duration: %s" % gcode.estimate_duration())
 
 
 if __name__ == '__main__':
