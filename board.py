@@ -66,6 +66,7 @@ class Board(object):
         self._tries = 0  # Check if command fails
         self.configuration = config
         self.load_configuration()
+        self.msgbox = ''
     
     def connect_serial(self):
         """Open serial port and perform handshake"""
@@ -292,7 +293,10 @@ class Board(object):
                 else:
                     self.send_to_socket(self.command_of_rotate.format(self._motor_position, self.rate))
             else:
-                self.send_command(self.command_of_rotate.format(step * self._motor_direction, self.rate), nonblocking, callback, False, self.set_attempt)
+                if self.is_serial:
+                    self.send_command(self.command_of_rotate.format(step * self._motor_direction, self.rate), nonblocking, callback, False, self.set_attempt)
+                else:
+                    self.send_to_socket(self.command_of_rotate.format(step * self._motor_direction, self.rate))
                 
     def send_to_socket(self, command):
         command_to_board = command.encode('utf-8') + b'\n'
