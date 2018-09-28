@@ -115,6 +115,7 @@ class Board(object):
             data = self.conn.read_until(b'\n', 2)
             self._is_connected = True
             print('recv vfrom board -> {}'.format(data))
+            self.init_load_conf()
             return True
         except:
             print('Error connect')
