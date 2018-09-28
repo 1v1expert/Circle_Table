@@ -107,13 +107,20 @@ class Board(object):
         if self._is_connected:
             self.disconnect()
         # New connect
-        con = Telnet(hostname, port, 2)
-        data = con.read_until(b'\n', 2)
-        print('Success connect, connect socket terminal - recv vfrom board -> {}'.format(data))
+        print('Success connect, connect socket terminal to {0} port: {1}'.format(hostname, port))
+        try:
+            self.conn = Telnet(hostname, port, 2)
+            self.conn.write(b'M105\n')
+            data = self.conn.read_until(b'\n', 2)
+            self._is_connected = True
+            print('recv vfrom board -> {}'.format(data))
+            return True
+        except:
+            print('Error connect')
+            return False
         #con.write(b'M105\n')
         #con.read_until(b'\n', 2)
         return False
-        
 
     def connect(self):
         # Connect to socket if "port" is an IP, device if not
@@ -275,10 +282,27 @@ class Board(object):
             self.set_attempt = step/rate * 60
             if self.coordinate_absolute:
                 self._motor_position += step * self._motor_direction
-                self.send_command(self.command_of_rotate.format(self._motor_position, self.rate), nonblocking, callback, False, self.set_attempt)
+                if self.is_serial:
+                    self.send_command(
+                        self.command_of_rotate.format(self._motor_position, self.rate),
+                        nonblocking,
+                        callback,
+                        False,
+                        self.set_attempt)
+                else:
+                    self.send_to_socket(self.command_of_rotate.format(self._motor_position, self.rate))
             else:
                 self.send_command(self.command_of_rotate.format(step * self._motor_direction, self.rate), nonblocking, callback, False, self.set_attempt)
-
+                
+    def send_to_socket(self, command):
+        command_to_board = command.encode('utf-8') + b'\n'
+        try:
+            self.conn.write(command_to_board)
+            recv = self.conn.read_until(b'\n', 2)
+        except:
+            self.disconnect()
+            print('Error write to board')
+        
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False, attempt=0.0):
         if nonblocking:
             threading.Thread(target=self._send_command,
@@ -295,7 +319,7 @@ class Board(object):
                 try:
                     self._serial_port.flushInput()
                     self._serial_port.flushOutput()
-                    self._serial_port.write(req + "\n".encode('utf-8'))
+                    self._serial_port.write(req + b"\n")
                     attempt = 0
                     print('Set_attempt -', set_attempt/0.01)
                     while req != '~' and req != '!' and ret == '':
