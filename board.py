@@ -108,7 +108,8 @@ class Board(object):
             self.disconnect()
         # New connect
         con = Telnet(hostname, port, 2)
-        print('Success connect, connect socket terminal')
+        data = con.read_until(b'\n', 2)
+        print('Success connect, connect socket terminal - recv vfrom board -> {}'.format(data))
         #con.write(b'M105\n')
         #con.read_until(b'\n', 2)
         return False
