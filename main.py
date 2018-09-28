@@ -16,7 +16,7 @@ import comscanner
 import board
 import time
 import logging
-import telnetlib
+
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +128,6 @@ class Ui_MainWindow(QMainWindow):
         
     def Rotate(self):
         if self.board._is_connected:
-            print('serial board =>', self.board.is_serial)
             if self.board.is_serial:
                 time.sleep(self.board.delay_before_start)
                 self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
@@ -138,8 +137,11 @@ class Ui_MainWindow(QMainWindow):
                     self.board.delay_sends(sec=self.board.delay_between_turns)
                 logger.info('-----FINISH ROTATE----')
             else:
+                time.sleep(self.board.delay_before_start)
+                self.board.delay_sends(sec=self.board.delay_before_start)
                 for rt in range(self.board.steps):
                     self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                    self.board.delay_sends(sec=self.board.delay_between_turns)
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()

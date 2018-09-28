@@ -119,9 +119,6 @@ class Board(object):
         except:
             print('Error connect')
             return False
-        #con.write(b'M105\n')
-        #con.read_until(b'\n', 2)
-        return False
 
     def connect(self):
         # Connect to socket if "port" is an IP, device if not
@@ -208,9 +205,11 @@ class Board(object):
             if len(self.init_commands) > 0 and self.use_init_command:
                 for cmd in self.init_commands:
                     command = cmd['command'] # No sure there
-                    self._send_command(command)
-                    response = self._serial_port.readlines()
-                    print(command, ' -Succes send init command, response: ', response)
+                    if self.is_serial:
+                        self._send_command(command)
+                        self._serial_port.readlines()
+                    else:
+                        self.send_to_socket(command)
             else:
                 logger.info('No find configuration or not command for init command')
         except:
@@ -265,7 +264,10 @@ class Board(object):
     
     def delay_sends(self, sec=0):
         if self._is_connected and self.use_delay_command:
-            self.send_command(self.cmd_delay_sends.format(sec), True, True, False, 0.0)
+            if self.is_serial:
+                self.send_command(self.cmd_delay_sends.format(sec), True, True, False, 0.0)
+            else:
+                self.send_to_socket(self.cmd_delay_sends.format(sec))
 
     def motor_reset_origin(self):
         if self._is_connected:
