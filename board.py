@@ -299,6 +299,7 @@ class Board(object):
         try:
             self.conn.write(command_to_board)
             recv = self.conn.read_until(b'\n', 2)
+            print(recv)
         except:
             self.disconnect()
             print('Error write to board')

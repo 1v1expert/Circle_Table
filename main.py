@@ -104,6 +104,7 @@ class Ui_MainWindow(QMainWindow):
             self.board.serial_name = self.serialPort
             if self.board.connect():
                 self.statusBar().showMessage('Подключено')
+                self.modalWindow.close()
             else:
                 self.statusBar().showMessage('Не удалось подключиться')
                 self.modalWindow.close()
