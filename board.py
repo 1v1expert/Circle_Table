@@ -13,8 +13,8 @@ import serial
 import json
 import logging
 import collections
-import socket
 import re
+from telnetlib import Telnet
 
 logger = logging.getLogger(__name__)
 
@@ -66,12 +66,13 @@ class Board(object):
         self._tries = 0  # Check if command fails
         self.configuration = config
         self.load_configuration()
-        #self.rate = 750
     
     def connect_serial(self):
         """Open serial port and perform handshake"""
         logger.info("Connecting board {0} {1}".format(self.serial_name, self.baud_rate))
         self._is_connected = False
+        if not self.serial_name:
+            return False
         try:
             self._serial_port = serial.Serial(self.serial_name, self.baud_rate, timeout=2)
             if self._serial_port.isOpen():
@@ -79,9 +80,6 @@ class Board(object):
                 version = self._serial_port.readlines()
                 #version_msg = "Version: {}".format(version)
                 logger.info(version)
-                #time.sleep(2)
-                #self.motor_enable()
-                #info = self.read(False)
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
                 #time.sleep(2)
@@ -102,25 +100,44 @@ class Board(object):
             logger.error("ERROR CONNECTING TO BOARD")
             return False  # else:  # return False  # raise WrongFirmware()
     
-    def connect_socket(self):
+    def connect_socket(self, hostname, port):
         """Open socket port and perform handshake"""
+        # Connect to socket if "port" is an IP, device if not
         logger.info("Connecting board {0} {1}".format(self.serial_name, self.baud_rate))
-        self._is_connected = False
+        if self._is_connected:
+            self.disconnect()
+        # New connect
+        con = Telnet(hostname, port, 2)
+        #con.write(b'M105\n')
+        #con.read_until(b'\n', 2)
+        return False
         
 
     def connect(self):
+        # Connect to socket if "port" is an IP, device if not
+        host_regexp = re.compile(
+            "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$|^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$")
+        self.is_serial = True
+        if ":" in self.serial_name:
+            bits = self.serial_name.split(":")
+            if len(bits) == 2:
+                hostname = bits[0]
+                try:
+                    port = int(bits[1])
+                    if host_regexp.match(hostname) and 1 <= port <= 65535:
+                        self.is_serial = False
+                except:
+                    pass
+        
         if self.is_serial:
             return self.connect_serial()
         else:
-            return self.connect_socket()
+            return self.connect_socket(hostname, port)
     
     def load_configuration(self):
         if self.configuration:
             try:
-                #self.rotation_speeds = collections.OrderedDict(self.configuration['Rotational_speed'])
-                #self.list_rates =
                 self.list_rates = list()
-                #print(lambda x: y.append(x)(for value in self.configuration['Rotational_speed']))
                 for keys in self.configuration['Rotational_speed']:
                     for key in keys.keys():
                         self.list_rates.append(key)

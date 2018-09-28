@@ -27,7 +27,7 @@ class Ui_MainWindow(QMainWindow):
         self.is_socket = False
         self.board = board.Board(config=self.configuration)
         self.std_speeds = self.board.baudrate # Скорость COM порта
-        self.check_open_ports()
+        #self.check_open_ports()
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
         #.encode('cp1251')
@@ -99,11 +99,19 @@ class Ui_MainWindow(QMainWindow):
         print(self.dest)
     
     def onConnectBoard(self):
-        if self.board.connect() and self.is_open_port:
-            self.statusBar().showMessage('Подключено')
+        self.serialPort = self.comboBox_SerialPorts.currentText()
+        if self.serialPort:
+            self.board.serial_name = self.serialPort
+            if self.board.connect():
+                self.statusBar().showMessage('Подключено')
+            else:
+                self.statusBar().showMessage('Не удалось подключиться')
+                self.modalWindow.close()
         else:
-            self.statusBar().showMessage('Не удалось подключиться')
-        self.modalWindow.close()
+            self.statusBar().showMessage('Нет доступного порта')
+            self.modalWindow.close()
+            time.sleep(0.7)
+            self.show_modal_window()
     
     def changeDegrees(self, degree):
         self.board.degrees = degree
