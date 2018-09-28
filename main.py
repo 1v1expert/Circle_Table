@@ -127,13 +127,17 @@ class Ui_MainWindow(QMainWindow):
         
     def Rotate(self):
         if self.board._is_connected:
-            time.sleep(self.board.delay_before_start)
-            self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
-            self.testApp()
-            for rt in range(self.board.steps):
-                self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
-                self.board.delay_sends(sec=self.board.delay_between_turns)
-            logger.info('-----FINISH ROTATE----')
+            if self.board.is_serial:
+                time.sleep(self.board.delay_before_start)
+                self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
+                self.testApp()
+                for rt in range(self.board.steps):
+                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                    self.board.delay_sends(sec=self.board.delay_between_turns)
+                logger.info('-----FINISH ROTATE----')
+            else:
+                for rt in range(self.board.steps):
+                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()
