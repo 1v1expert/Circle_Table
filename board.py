@@ -221,16 +221,19 @@ class Board(object):
             
     def disconnect(self):
         """Close serial port"""
-        if self._is_connected:
-            logger.info("Disconnecting board {0}".format(self.serial_name))
-            try:
-                if self._serial_port is not None:
-                    self._is_connected = False
-                    self._serial_port.close()
-                    del self._serial_port
-            except serial.SerialException:
-                logger.error("Error closing the port {0}\n".format(self.serial_name))
-            logger.info(" Done")
+        if self.is_serial:
+            if self._is_connected:
+                logger.info("Disconnecting board {0}".format(self.serial_name))
+                try:
+                    if self._serial_port is not None:
+                        self._is_connected = False
+                        self._serial_port.close()
+                        del self._serial_port
+                except serial.SerialException:
+                    logger.error("Error closing the port {0}\n".format(self.serial_name))
+                logger.info(" Done")
+        else:
+            self.conn.close()
 
     def set_unplug_callback(self, value):
         self.unplug_callback = value

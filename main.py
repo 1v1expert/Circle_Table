@@ -109,11 +109,13 @@ class Ui_MainWindow(QMainWindow):
         else:
             self.statusBar().showMessage('Отключено')
             self.ConnectButtonSerial.setText("подключить")
+            self.modalWindow.close()
         
     def onConnectBoard(self):
         self.serialPort = self.comboBox_SerialPorts.currentText()
         if self.online:
             self.board.disconnect()
+            self.triggerConnect()
         else:
             if self.serialPort:
                 self.board.serial_name = self.serialPort
