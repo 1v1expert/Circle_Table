@@ -27,6 +27,7 @@ class Ui_MainWindow(QMainWindow):
         self.is_socket = False
         self.board = board.Board(config=self.configuration)
         self.std_speeds = self.board.baudrate # Скорость COM порта
+        self.online = False
         #self.check_open_ports()
         #self.configuration = board.read_configuration(self)
         #print(self.configuration['Rotational_speed'].keys())
@@ -40,8 +41,8 @@ class Ui_MainWindow(QMainWindow):
     def check_open_ports(self):
         self.is_open_port = True
         if not self.board.serial_name:
-            if (len(self.board.get_serial_list())):
-                self.board.serial_name = self.board.get_serial_list()[0]
+            if (len(self.board.serial_list)):
+                self.board.serial_name = self.board.serial_list[0]
             else:
                 self.is_open_port = False
                 self.statusBar().showMessage('Нет доступного порта')
@@ -97,22 +98,35 @@ class Ui_MainWindow(QMainWindow):
         self.dest = self.address_connection.text() + ":" + ports[0]
         # --- Start princore\
         print(self.dest)
-    
+    def triggerConnect(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.online = not self.online
+        if self.online:
+            #self.ConnectButtonSerial.destroy()
+            self.ConnectButtonSerial.setText("отключить")
+            self.statusBar().showMessage('Подключено')
+            self.modalWindow.close()
+        else:
+            self.statusBar().showMessage('Отключено')
+            self.ConnectButtonSerial.setText("подключить")
+        
     def onConnectBoard(self):
         self.serialPort = self.comboBox_SerialPorts.currentText()
-        if self.serialPort:
-            self.board.serial_name = self.serialPort
-            if self.board.connect():
-                self.statusBar().showMessage('Подключено')
-                self.modalWindow.close()
-            else:
-                self.statusBar().showMessage('Не удалось подключиться')
-                self.modalWindow.close()
+        if self.online:
+            self.board.disconnect()
         else:
-            self.statusBar().showMessage('Нет доступного порта')
-            self.modalWindow.close()
-            time.sleep(0.7)
-            self.show_modal_window()
+            if self.serialPort:
+                self.board.serial_name = self.serialPort
+                if self.board.connect():
+                    self.triggerConnect()
+                else:
+                    self.statusBar().showMessage('Не удалось подключиться')
+                    self.modalWindow.close()
+            else:
+                self.statusBar().showMessage('Нет доступного порта')
+                self.modalWindow.close()
+                time.sleep(0.7)
+                self.show_modal_window()
     
     def changeDegrees(self, degree):
         self.board.degrees = degree
@@ -127,21 +141,33 @@ class Ui_MainWindow(QMainWindow):
         self.board.delay_between_turns = sec
         
     def Rotate(self):
+        if not self.board._is_connected:
+            if self.online:
+                self.triggerConnect()
         if self.board._is_connected:
-            if self.board.is_serial:
-                time.sleep(self.board.delay_before_start)
-                self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
-                self.testApp()
-                for rt in range(self.board.steps):
-                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
-                    self.board.delay_sends(sec=self.board.delay_between_turns)
-                logger.info('-----FINISH ROTATE----')
-            else:
-                time.sleep(self.board.delay_before_start)
-                self.board.delay_sends(sec=self.board.delay_before_start)
-                for rt in range(self.board.steps):
-                    self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
-                    self.board.delay_sends(sec=self.board.delay_between_turns)
+            try:
+                if self.board.is_serial:
+                    time.sleep(self.board.delay_before_start)
+                    self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
+                    self.testApp()
+                    for rt in range(self.board.steps):
+                        self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                        if rt == self.board.steps or self.board.steps == 1:
+                            pass
+                        else:
+                            self.board.delay_sends(sec=self.board.delay_between_turns)
+                    logger.info('-----FINISH ROTATE----')
+                else:
+                    time.sleep(self.board.delay_before_start)
+                    self.board.delay_sends(sec=self.board.delay_before_start)
+                    for rt in range(self.board.steps):
+                        self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                        if rt == self.board.steps or self.board.steps == 1:
+                            pass
+                        else:
+                            self.board.delay_sends(sec=self.board.delay_between_turns)
+            except:
+                self.triggerConnect()
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()
@@ -171,8 +197,8 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_SerialPorts.setMaxVisibleItems(12)
         self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
         self.comboBox_SerialPorts.setEditable(True)
-        if (len(self.board.get_serial_list())):
-            self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        if (len(self.board.serial_list)):
+            self.comboBox_SerialPorts.addItems(self.board.serial_list)
         else:
             self.comboBox_SerialPorts.addItems(['Устройства не найдены'])
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
@@ -214,9 +240,12 @@ class Ui_MainWindow(QMainWindow):
         
         self.ConnectButtonSerial = QtWidgets.QPushButton(self.groupBox)
         self.ConnectButtonSerial.setGeometry(QtCore.QRect(120, 65, 180, 51))
-        self.ConnectButtonSerial.setCheckable(False)
-        self.ConnectButtonSerial.setObjectName("pushButton")
-        self.ConnectButtonSerial.setText(_translate("MainWindow", "подключить"))
+        self.ConnectButtonSerial.setCheckable(True)
+        self.ConnectButtonSerial.setObjectName("ConnectButtonSerial")
+        if self.online:
+            self.ConnectButtonSerial.setText("отключить")
+        else:
+            self.ConnectButtonSerial.setText("подключить")
         self.ConnectButtonSerial.clicked.connect(self.onConnectBoard)
         
         self.modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
@@ -341,12 +370,12 @@ class Ui_MainWindow(QMainWindow):
 
         self.OpenSettings = QtWidgets.QPushButton(self.groupBox)
         self.OpenSettings.setGeometry(QtCore.QRect(150, 340, 121, 51))
-        self.OpenSettings.setCheckable(False)
+        self.OpenSettings.setCheckable(True)
         self.OpenSettings.setObjectName("OpenSettings")
         
         self.pushButton = QtWidgets.QPushButton(self.groupBox)
         self.pushButton.setGeometry(QtCore.QRect(30, 340, 121, 51))
-        self.pushButton.setCheckable(False)
+        self.pushButton.setCheckable(True)
         self.pushButton.setObjectName("pushButton")
         
         #----- MAin button

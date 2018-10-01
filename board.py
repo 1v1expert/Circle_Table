@@ -67,6 +67,8 @@ class Board(object):
         self.configuration = config
         self.load_configuration()
         self.msgbox = ''
+        self.serial_list = self.get_serial_list()
+        self.serial_list.append(self.host_ip)
     
     def connect_serial(self):
         """Open serial port and perform handshake"""
@@ -194,6 +196,7 @@ class Board(object):
         self.height_window = 500
         # Set host ip
         self.host_ip = "127.0.0.1"
+        
         # Set position coordinate
         self.coordinate_absolute = False
         # Set Baudrate
