@@ -9,7 +9,6 @@ import main, board
 import sys
 from PyQt5.QtWidgets import QApplication
 import logging
-import printcore
 
 logging.basicConfig(filename='3dcircle.log',
                     format = u'%(filename)s[LINE:%(lineno)d]# %(levelname)-8s [%(asctime)s]  %(message)s',
