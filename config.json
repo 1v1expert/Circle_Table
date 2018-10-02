@@ -1,0 +1,47 @@
+{
+  "Init_command":[
+    {
+      "command": "M92 X45.3"
+    },
+    {
+      "command": "G92 X0"
+    },
+    {
+      "command": "G91"
+    }
+  ],
+  "Rotational_speed": [
+    {
+      "медленно": 750
+    },
+    {
+      "средне": 3750
+    },
+    {
+      "быстро": 7500
+    }
+  ],
+  "Default_settings": {
+    "Degrees": 1012,
+    "Steps": 20,
+    "Delay_before_start": 7,
+    "Delay_between_turns": 3
+  },
+  "Baudrate": [
+    "250000",
+    "115200",
+    "57600",
+    "38400",
+    "19200",
+    "9600",
+    "4800"
+  ],
+  "Width_window": 550,
+  "Height_window": 500,
+  "Host_ip": "127.0.0.1",
+  "Delay_command": "G4 S{0}",
+  "Command_of_rotate": "G1X{0}F{1}",
+  "Coordinate_absolute": false,
+  "Use_init_command": false,
+  "Use_delay_command": false
+}
