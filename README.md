@@ -1,7 +1,7 @@
 # The rotary table control program
 ![Screenshot](https://github.com/1v1expert/Circle_Table/raw/develop/img/TmpSVG1.jpg)
 
-### 3DCircle program
+### 3DQ Rotate program
 
 ![3DCircle program](https://github.com/1v1expert/Circle_Table/raw/master/img/screenshot.png)
 
