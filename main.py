@@ -14,48 +14,61 @@ from PyQt5.QtWidgets import (QMainWindow, QAction, qApp, QWidget, QLabel, QLineE
 import sys
 import board
 import time
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 class Ui_MainWindow(QMainWindow):
-    def __init__(self):
-        self.std_speeds = ['250000', '115200', '57600', '38400', '19200', '9600', '4800',
-                      '2400', '1200', '600', '300', '150', '100', '75', '50']  # Скорость COM порта
-        self.degrees = 10
-        self.steps = 1
-        self.rate = 750
-        self.delay_before_start = 0
-        self.delay_between_turns = 1
+    def __init__(self, config):
         self.invert = False
-        
+        self.configuration = config
+        self.is_socket = False
+        self.board = board.Board(config=self.configuration)
+        self.std_speeds = self.board.baudrate # Скорость COM порта
+        self.online = False
+        #self.check_open_ports()
+        #self.configuration = board.read_configuration(self)
+        #print(self.configuration['Rotational_speed'].keys())
+        #.encode('cp1251')
         super().__init__()
         self.setupUi(self)
-        self.board = board.Board()
+        self.testApp()
         
+        logging.info('Success init app')
         
-        
-    def motor_invert(self, choos):
-        if choos == 'Инверс':
+    def check_open_ports(self):
+        self.is_open_port = True
+        if not self.board.serial_name:
+            if (len(self.board.serial_list)):
+                self.board.serial_name = self.board.serial_list[0]
+            else:
+                self.is_open_port = False
+                self.statusBar().showMessage('Нет доступного порта')
+
+    def motor_invert(self, choose):
+        if choose == 'Инверс':
             self.board.motor_invert(True)
         else:
             self.board.motor_invert(False)
-            
-    def ChangeRate_motor(self, rate):
-        speed = 750
-        if rate == "Медленная": speed = 750
-        elif rate == "Средняя": speed = 3750
-        elif rate == "Высокая": speed = 7500
-        #self.board._motor_speed = speed
-        self.board.motor_speed(speed)
-
+    
+    def testApp(self):
+        print('Rate - {0}, Steps - {1}, Degrees - {2}'.format(self.board.rate, self.board.steps, self.board.degrees))
         
+    def ChangeRate_motor(self, rate):
+        try:
+            for key in self.configuration['Rotational_speed']:
+                if key.get(rate): self.board.rate = key.get(rate)
+        except:
+            if rate == "медленно": self.board.rate = 750
+            elif rate == "средне": self.board.rate = 3750
+            elif rate == "быстро": self.board.rate = 7500
+            #self.board._motor_speed = speed
+        #self.board.motor_speed(self.board.rate)
+
     def onChanged(self, text):
         self.lineEdit.setText(text)
         self.lineEdit.adjustSize()
-        
-    def find_ports(self):
-        comscanner.find_ports()
-        
-    def Init_board(self):
-        comscanner.get_start()
 
     def onSetSerial(self, serial_name):
         self.board.serial_name = serial_name
@@ -63,46 +76,96 @@ class Ui_MainWindow(QMainWindow):
     def onSetSerialSpeeds(self, speed):
         self.board.baud_rate = int(speed)
     
-    def onConnectBoard(self):
-        f_rot = True
-        if not self.board.serial_name:
-            if (len(self.board.get_serial_list())):
-                self.board.serial_name = self.board.get_serial_list()[0]
-            else:
-                f_rot = False
-                self.statusBar().showMessage('Нет доступного порта')
-                
-        if self.board.connect() and f_rot:
+    def onConnectBoardTelnet(self):
+        """ Connect device to telnet protocol """
+        #tn = telnetlib.Telnet("192.168.1.124", "22")
+        #tn.write(b"STATUS\n\n")
+        #request = tn.read_all()
+        text = self.port_connection.text()
+        #text_after = ""
+        #for char in text:
+        #    try: a_char = int(char)
+        #    except: a_char = char
+        #    if isinstance(a_char, int):
+        #        text_after += str(a_char)
+        if self.comboBox_SerialPorts.lineEdit():
+            print('LINEEDIT-', self.comboBox_SerialPorts.currentText())
+        ports = [port for port in text.split() if port.isdigit()]
+        self.dest = self.address_connection.text() + ":" + ports[0]
+        # --- Start princore\
+        print(self.dest)
+    def triggerConnect(self):
+        _translate = QtCore.QCoreApplication.translate
+        self.online = not self.online
+        if self.online:
+            #self.ConnectButtonSerial.destroy()
+            self.ConnectButtonSerial.setText("отключить")
             self.statusBar().showMessage('Подключено')
+            self.modalWindow.close()
         else:
-            self.statusBar().showMessage('Не удалось подключиться')
-        self.modalWindow.close()
+            self.statusBar().showMessage('Отключено')
+            self.ConnectButtonSerial.setText("подключить")
+            self.modalWindow.close()
+        
+    def onConnectBoard(self):
+        self.serialPort = self.comboBox_SerialPorts.currentText()
+        if self.online:
+            self.board.disconnect()
+            self.triggerConnect()
+        else:
+            if self.serialPort:
+                self.board.serial_name = self.serialPort
+                if self.board.connect():
+                    self.triggerConnect()
+                else:
+                    self.statusBar().showMessage('Не удалось подключиться')
+                    self.modalWindow.close()
+            else:
+                self.statusBar().showMessage('Нет доступного порта')
+                self.modalWindow.close()
+                time.sleep(0.7)
+                self.show_modal_window()
     
     def changeDegrees(self, degree):
-        self.degrees = degree
+        self.board.degrees = degree
         
     def changeSteps(self, step):
-        self.steps = step
+        self.board.steps = step
     
     def ChangeDelay_before_start(self, sec):
-        self.delay_before_start = sec
+        self.board.delay_before_start = sec
     
     def Changedelay_between_turns(self, sec):
-        self.delay_between_turns = sec
+        self.board.delay_between_turns = sec
         
     def Rotate(self):
+        if not self.board._is_connected:
+            if self.online:
+                self.triggerConnect()
         if self.board._is_connected:
-            print('Start rotate')
-            #self.board.motor_enable()
-            time.sleep(self.delay_before_start)
-            print('motor speed = ', self.board._motor_speed, " steps = ", self.degrees)
-            
-            for rt in range(self.steps):
-                sec = float(self.degrees / self.board._motor_speed)
-                print("sec = ", 10 * sec * 6, " sleep = ", sec + self.delay_between_turns)
-                self.board.motor_move(step=self.degrees)
-                time.sleep(60 * sec + self.delay_between_turns)
-            
+            try:
+                if self.board.is_serial:
+                    time.sleep(self.board.delay_before_start)
+                    self.board.delay_sends(sec=self.board.delay_before_start) #Should me rewrite
+                    self.testApp()
+                    for rt in range(self.board.steps):
+                        self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                        if rt == self.board.steps or self.board.steps == 1:
+                            pass
+                        else:
+                            self.board.delay_sends(sec=self.board.delay_between_turns)
+                    logger.info('-----FINISH ROTATE----')
+                else:
+                    time.sleep(self.board.delay_before_start)
+                    self.board.delay_sends(sec=self.board.delay_before_start)
+                    for rt in range(self.board.steps):
+                        self.board.motor_move_exchange(step=self.board.degrees, rate=self.board.rate)
+                        if rt == self.board.steps or self.board.steps == 1:
+                            pass
+                        else:
+                            self.board.delay_sends(sec=self.board.delay_between_turns)
+            except:
+                self.triggerConnect()
         else:
             self.statusBar().showMessage('Ошибка! Нет подключения')
             self.show_modal_window()
@@ -131,43 +194,70 @@ class Ui_MainWindow(QMainWindow):
         self.comboBox_SerialPorts.setCurrentText("")
         self.comboBox_SerialPorts.setMaxVisibleItems(12)
         self.comboBox_SerialPorts.setObjectName("comboBox_SerialPorts")
-        if (len(self.board.get_serial_list())):
-            self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
+        self.comboBox_SerialPorts.setEditable(True)
+        if (len(self.board.serial_list)):
+            self.comboBox_SerialPorts.addItems(self.board.serial_list)
         else:
             self.comboBox_SerialPorts.addItems(['Устройства не найдены'])
         self.comboBox_SerialPorts.activated[str].connect(self.onSetSerial)
 
-        self.comboBox_Std_speeds = QtWidgets.QComboBox(self.groupBox)
-        self.comboBox_Std_speeds.setGeometry(QtCore.QRect(300, 25, 120, 22))
-        self.comboBox_Std_speeds.setCurrentText("")
-        self.comboBox_Std_speeds.setMaxVisibleItems(12)
-        self.comboBox_Std_speeds.setObjectName("comboBox_Std_speeds")
-        #if (len(self.board.get_serial_list())):
-        #    self.comboBox_SerialPorts.addItems(self.board.get_serial_list())
-        #else:
-        self.comboBox_Std_speeds.addItems(self.std_speeds)
-        self.comboBox_Std_speeds.activated[str].connect(self.onSetSerialSpeeds)
+        self.comboBox_Std_speeds_board = QtWidgets.QComboBox(self.groupBox)
+        self.comboBox_Std_speeds_board.setGeometry(QtCore.QRect(300, 25, 120, 22))
+        self.comboBox_Std_speeds_board.setCurrentText("")
+        self.comboBox_Std_speeds_board.setMaxVisibleItems(12)
+        self.comboBox_Std_speeds_board.setObjectName("comboBox_Std_speeds")
+        #self.comboBox_Std_speeds_board.setEditable(True)
+        self.comboBox_Std_speeds_board.addItems(self.std_speeds)
+        self.comboBox_Std_speeds_board.activated[str].connect(self.onSetSerialSpeeds)
         
-        self.ConnectButton = QtWidgets.QPushButton(self.groupBox)
-        self.ConnectButton.setGeometry(QtCore.QRect(90, 80, 221, 51))
-        self.ConnectButton.setCheckable(False)
-        self.ConnectButton.setObjectName("pushButton")
+        #self.address_connection = QtWidgets.QLineEdit(self.groupBox)
+        #self.address_connection.setInputMask('090.090.090.090')
+        #self.address_connection.setText(self.board.host_ip)
+        #self.address_connection.setGeometry(QtCore.QRect(65, 55, 131, 22))
+        #self.port_connection.valueChanged[int].connect(self.Changedelay_between_turns)
+        #self.address_connection.setVisible(True)
         
-        self.ConnectButton.setText(_translate("MainWindow", "подключить"))
-        self.ConnectButton.clicked.connect(self.onConnectBoard)
+        #self.port_connection = QtWidgets.QSpinBox(self.groupBox)
+        #self.port_connection.setRange(0, 99999)
+        #self.port_connection.setValue(22)
+        #self.port_connection.setSingleStep(1)
+        #self.port_connection.setSuffix(" порт")
+        #self.port_connection.setGeometry(QtCore.QRect(310, 55, 80, 22))
+        #self.port_connection.valueChanged[int].connect(self.Changedelay_between_turns)
+        #self.port_connection.setVisible(True)
+
+        #self.flo = QtWidgets.QFormLayout()
+        #self.flo.addRow("integer validator", self.port_connection)
+
+        #self.ConnectButtonTelnet = QtWidgets.QPushButton(self.groupBox)
+        #self.ConnectButtonTelnet.setGeometry(QtCore.QRect(10, 80, 180, 51))
+        #self.ConnectButtonTelnet.setCheckable(False)
+        #self.ConnectButtonTelnet.setObjectName("pushButton")
+        #self.ConnectButtonTelnet.setText(_translate("MainWindow", "Telnet"))
+        #self.ConnectButtonTelnet.clicked.connect(self.onConnectBoardTelnet)
         
-        #self.statusBar().showMessage('подключено')
+        self.ConnectButtonSerial = QtWidgets.QPushButton(self.groupBox)
+        self.ConnectButtonSerial.setGeometry(QtCore.QRect(120, 65, 180, 51))
+        self.ConnectButtonSerial.setCheckable(True)
+        self.ConnectButtonSerial.setObjectName("ConnectButtonSerial")
+        if self.online:
+            self.ConnectButtonSerial.setText("отключить")
+        else:
+            self.ConnectButtonSerial.setText("подключить")
+        self.ConnectButtonSerial.clicked.connect(self.onConnectBoard)
         
         self.modalWindow.setAttribute(QtCore.Qt.WA_DeleteOnClose, True)
+        #self.modalWindow.setLayout(self.flo)
         self.modalWindow.move(self.geometry().center() - self.modalWindow.rect().center() - QtCore.QPoint(100, 50))
+        
         self.modalWindow.show()
         
     def setupUi(self, MainWindow):
         
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(500, 500)
-        MainWindow.setMinimumSize(QtCore.QSize(550, 500))
-        MainWindow.setMaximumSize(QtCore.QSize(550, 500))
+        MainWindow.resize(self.board.width_window, self.board.height_window)
+        MainWindow.setMinimumSize(QtCore.QSize(self.board.width_window, self.board.height_window))
+        MainWindow.setMaximumSize(QtCore.QSize(self.board.width_window, self.board.height_window))
         #MainWindow.setWindowOpacity(0.0)
         MainWindow.setAutoFillBackground(True)
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
@@ -179,20 +269,20 @@ class Ui_MainWindow(QMainWindow):
         self.groupBox.setGeometry(QtCore.QRect(10, 20, 311, 411))
         self.groupBox.setObjectName("groupBox")
         
-        
-        
         self.label = QtWidgets.QLabel(self.groupBox)
         self.label.setGeometry(QtCore.QRect(10, 50, 111, 41))
+        #-- Set Font --
         font = QtGui.QFont()
         font.setBold(True)
         font.setWeight(75)
+        
         self.label.setFont(font)
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
 
         self.DegreesSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.DegreesSpinBox.setRange(0, 1000)
-        self.DegreesSpinBox.setValue(self.degrees)
+        self.DegreesSpinBox.setValue(self.board.degrees)
         self.DegreesSpinBox.setSingleStep(5)
         #self.spinBox.setPrefix("текст до (")
         self.DegreesSpinBox.setSuffix(" градусов")
@@ -216,14 +306,14 @@ class Ui_MainWindow(QMainWindow):
         self.RateComboBox.setCurrentText("")
         self.RateComboBox.setMaxVisibleItems(12)
         self.RateComboBox.setObjectName("comboBox")
-        self.RateComboBox.addItems(["Медленная", "Средняя", "Высокая"])
+        self.RateComboBox.addItems(self.board.list_rates)
         self.RateComboBox.activated[str].connect(self.ChangeRate_motor)
         ## ---
-
+        # -- Choose steps degrees --
         self.ValueStepsSpinBox = QtWidgets.QSpinBox(self.groupBox)
         self.ValueStepsSpinBox.setRange(0, 100)
-        self.ValueStepsSpinBox.setValue(1)
-        self.ValueStepsSpinBox.setSingleStep(self.steps)
+        self.ValueStepsSpinBox.setValue(self.board.steps)
+        self.ValueStepsSpinBox.setSingleStep(1)
         # self.spinBox.setPrefix("текст до (")
         self.ValueStepsSpinBox.setSuffix(" шаг(-а, -ов)")
         self.ValueStepsSpinBox.setGeometry(QtCore.QRect(190, 100, 113, 20))
@@ -260,7 +350,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.Delay_between_turns = QtWidgets.QSpinBox(self.groupBox)
         self.Delay_between_turns.setRange(0, 1000)
-        self.Delay_between_turns.setValue(self.delay_between_turns)
+        self.Delay_between_turns.setValue(self.board.delay_between_turns)
         self.Delay_between_turns.setSingleStep(10)
         self.Delay_between_turns.setSuffix(" c")
         self.Delay_between_turns.setGeometry(QtCore.QRect(190, 240, 113, 20))
@@ -269,7 +359,7 @@ class Ui_MainWindow(QMainWindow):
 
         self.Delay_before_start = QtWidgets.QSpinBox(self.groupBox)
         self.Delay_before_start.setRange(0, 1000)
-        self.Delay_before_start.setValue(self.delay_before_start)
+        self.Delay_before_start.setValue(self.board.delay_before_start)
         self.Delay_before_start.setSingleStep(10)
         self.Delay_before_start.setSuffix(" c")
         self.Delay_before_start.setGeometry(QtCore.QRect(190, 190, 113, 20))
@@ -278,18 +368,16 @@ class Ui_MainWindow(QMainWindow):
 
         self.OpenSettings = QtWidgets.QPushButton(self.groupBox)
         self.OpenSettings.setGeometry(QtCore.QRect(150, 340, 121, 51))
-        self.OpenSettings.setCheckable(False)
+        self.OpenSettings.setCheckable(True)
         self.OpenSettings.setObjectName("OpenSettings")
         
         self.pushButton = QtWidgets.QPushButton(self.groupBox)
         self.pushButton.setGeometry(QtCore.QRect(30, 340, 121, 51))
-        self.pushButton.setCheckable(False)
+        self.pushButton.setCheckable(True)
         self.pushButton.setObjectName("pushButton")
         
         #----- MAin button
         self.pushButton.clicked.connect(self.Rotate)
-        #self.pushButton.clicked.connect(self.Init_board)
-        #self.pushButton.clicked.connect(self.show_modal_window)
         self.OpenSettings.clicked.connect(self.show_modal_window)
         #self.pushButton.clicked.connect(self.find_ports)
         #self.pushButton.clicked.connect(QtCore.QCoreApplication.instance().quit)
@@ -358,12 +446,9 @@ class Ui_MainWindow(QMainWindow):
         #self.lineEdit.setInputMask(_translate("MainWindow", "99999"))
         self.label_2.setText(_translate("MainWindow", "Количество шагов:"))
         self.label_3.setText(_translate("MainWindow", "Скорость вращения:"))
-        #self.lineEdit_2.setInputMask(_translate("MainWindow", "99999"))
         self.label_4.setText(_translate("MainWindow", "Задержка перед стартом:"))
         self.label_5.setText(_translate("MainWindow", "Задержка между поворотами:"))
         self.label_6.setText(_translate("MainWindow", "Направление вращения:"))
-        #self.lineEdit_3.setInputMask(_translate("MainWindow", "99999"))
-        #self.lineEdit_4.setInputMask(_translate("MainWindow", "99999"))
         self.pushButton.setText(_translate("MainWindow", "Старт"))
         self.pushButton.setShortcut(_translate("MainWindow", "Return"))
 
@@ -378,27 +463,5 @@ class myWin(QtWidgets.QMainWindow):
 
 if __name__=="__main__":
     app = QApplication(sys.argv)
-    
-    
-    #window = QMainWindow()
-    #ss = myWin()
-    #window.show()
-    
     ui = Ui_MainWindow()
-    #ui.setupUi(window)
-    #window.show()
     sys.exit(app.exec_())
-    
-    
-    #app = QtWidgets.QApplication(sys.argv)
-    #myapp = myWin()
-    #myapp.show()
-    #sys.exit(app.exec_())
-
-#app = QApplication(sys.argv)
-#window = QtGui()
-#ui = Ui_MainWindow()
-#ui.setupUi(window)
-#QtCore.QObject.connect(ui.butQuit, QtCore.SIGNAL("clicked()"), QtGui.qApp.quit)
-#window.show()
-#sys.exit(app.exec_())
