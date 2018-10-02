@@ -28,28 +28,28 @@ def read_configuration():
         data_restruct = collections.OrderedDict(jf_file)
         return data_restruct
 
-class WrongFirmware(Exception):
 
+class WrongFirmware(Exception):
+    
     def __init__(self):
         Exception.__init__(self, "Wrong Firmware")
 
 
 class BoardNotConnected(Exception):
-
+    
     def __init__(self):
         Exception.__init__(self, "Board Not Connected")
 
 
 class OldFirmware(Exception):
-
+    
     def __init__(self):
         Exception.__init__(self, "Old Firmware")
 
 
 class Board(object):
-
     """Board class. For accessing to the scanner board"""
-
+    
     def __init__(self, config, parent=None, serial_name='', baud_rate=250000):
         self.parent = parent
         self.serial_name = serial_name
@@ -81,41 +81,15 @@ class Board(object):
             if self._serial_port.isOpen():
                 logger.info("Try openning serial port on {0}\n".format(system))
                 version = self._serial_port.readlines()
-                #version_msg = "Version: {}".format(version)
+                # version_msg = "Version: {}".format(version)
                 logger.info(version)
-<<<<<<< HEAD
-                time.sleep(2)
-                self.motor_enable()
-                info = self.read(False)
-                print(info)
-                
-=======
                 self._serial_port.timeout = 0.05
                 self._is_connected = True
->>>>>>> develop
-                #time.sleep(2)
-                #self.motor_move(step=0)
-                #info = self.read(False)
-                #print(info)
-<<<<<<< HEAD
-                #version = self._serial_port.readlines()
-                #for ver in version:
-                #    print(ver.decode('utf-8'))
-                #version = self._serial_port.readline()
-                #print(version)
-                self._serial_port.timeout = 0.05
-                self._is_connected = True
-                time.sleep(2)
-                self.motor_move(step=0)
-                info = self.read(False)
-                print(info)
-                # Set current position as origin
-                #self.motor_reset_origin()
-                logger.info(" Done")
-                return True
-=======
+                # time.sleep(2)
+                # self.motor_move(step=0)
+                # info = self.read(False)
+                # print(info)
                 self.init_load_conf()
->>>>>>> develop
             else:
                 raise BoardNotConnected()
         except Exception as exception:
@@ -148,7 +122,7 @@ class Board(object):
         except:
             print('Error connect')
             return False
-
+    
     def connect(self):
         # Connect to socket if "port" is an IP, device if not
         host_regexp = re.compile(
@@ -185,7 +159,7 @@ class Board(object):
                 self.use_delay_command = self.configuration['Use_delay_command']
                 self.init_commands = self.configuration['Init_command']
                 self.use_init_command = self.configuration['Use_init_command']
-                #Size main window
+                # Size main window
                 self.width_window = self.configuration['Width_window']
                 self.height_window = self.configuration['Height_window']
                 # Set command roatet
@@ -205,7 +179,7 @@ class Board(object):
         else:
             logging.error("No loaded configuration from file")
             self.def_settings()
-            
+    
     def def_settings(self):
         self.list_rates = ['медленно', 'средне', 'быстро']
         self.delay_before_start = 0
@@ -229,12 +203,12 @@ class Board(object):
         self.baudrate = ['250000', '115200', '57600', '38400', '19200', '9600', '4800']
         # Set rate motor
         self.rate = 750
-        
+    
     def init_load_conf(self):
         try:
             if len(self.init_commands) > 0 and self.use_init_command:
                 for cmd in self.init_commands:
-                    command = cmd['command'] # No sure there
+                    command = cmd['command']  # No sure there
                     if self.is_serial:
                         self._send_command(command)
                         self._serial_port.readlines()
@@ -244,7 +218,7 @@ class Board(object):
                 logger.info('No find configuration or not command for init command')
         except:
             logger.error('Error load init configuration commands')
-            
+    
     def disconnect(self):
         """Close serial port"""
         if self.is_serial:
@@ -260,28 +234,28 @@ class Board(object):
                 logger.info(" Done")
         else:
             self.conn.close()
-
+    
     def set_unplug_callback(self, value):
         self.unplug_callback = value
-
+    
     def motor_invert(self, value):
         if value:
             self._motor_direction = -1
         else:
             self._motor_direction = +1
-
+    
     def motor_speed(self, value):
         if self._is_connected:
-            #if self._motor_speed != value:
+            # if self._motor_speed != value:
             self._motor_speed = value
             self._send_command("G1F{0}".format(value))
-
+    
     def motor_acceleration(self, value):
         if self._is_connected:
             if self._motor_acceleration != value:
                 self._motor_acceleration = value
                 self._send_command("$120={0}".format(value))
-
+    
     def motor_enable(self):
         if self._is_connected:
             if not self._motor_enabled:
@@ -301,38 +275,35 @@ class Board(object):
                 self.send_command(self.cmd_delay_sends.format(sec), True, True, False, 0.0)
             else:
                 self.send_to_socket(self.cmd_delay_sends.format(sec))
-
+    
     def motor_reset_origin(self):
         if self._is_connected:
             self._send_command("G50")
             self._motor_position = 0
-
+    
     def motor_move(self, step=0, nonblocking=True, callback=True):
         if self._is_connected:
             self._motor_position += step * self._motor_direction
-            self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
-            #self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
+            self.send_command("G1X{0}".format(self._motor_position), nonblocking,
+                              callback)  # self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
     
     def motor_move_exchange(self, step=0, rate=0, nonblocking=True, callback=True):
         if self._is_connected:
-            self.set_attempt = step/rate * 60
+            self.set_attempt = step / rate * 60
             if self.coordinate_absolute:
                 self._motor_position += step * self._motor_direction
                 if self.is_serial:
-                    self.send_command(
-                        self.command_of_rotate.format(self._motor_position, self.rate),
-                        nonblocking,
-                        callback,
-                        False,
-                        self.set_attempt)
+                    self.send_command(self.command_of_rotate.format(self._motor_position, self.rate), nonblocking,
+                        callback, False, self.set_attempt)
                 else:
                     self.send_to_socket(self.command_of_rotate.format(self._motor_position, self.rate))
             else:
                 if self.is_serial:
-                    self.send_command(self.command_of_rotate.format(step * self._motor_direction, self.rate), nonblocking, callback, False, self.set_attempt)
+                    self.send_command(self.command_of_rotate.format(step * self._motor_direction, self.rate),
+                                      nonblocking, callback, False, self.set_attempt)
                 else:
                     self.send_to_socket(self.command_of_rotate.format(step * self._motor_direction, self.rate))
-                
+    
     def send_to_socket(self, command):
         command_to_board = command.encode('utf-8') + b'\n'
         try:
@@ -342,14 +313,13 @@ class Board(object):
         except:
             self.disconnect()
             print('Error write to board')
-        
+    
     def send_command(self, req, nonblocking=False, callback=None, read_lines=False, attempt=0.0):
         if nonblocking:
-            threading.Thread(target=self._send_command,
-                             args=(req, attempt, callback, read_lines)).start()
+            threading.Thread(target=self._send_command, args=(req, attempt, callback, read_lines)).start()
         else:
             self._send_command(req, attempt, callback, read_lines)
-
+    
     def _send_command(self, req, set_attempt=0.0, callback=None, read_lines=False):
         """Sends the request and returns the response"""
         ret = ''
@@ -361,17 +331,17 @@ class Board(object):
                     self._serial_port.flushOutput()
                     self._serial_port.write(req + b"\n")
                     attempt = 0
-                    print('Set_attempt -', set_attempt/0.01)
+                    print('Set_attempt -', set_attempt / 0.01)
                     while req != '~' and req != '!' and ret == '':
-                        if ret =='': attempt += 1
-                        #ret = self._serial_port.readlines()
+                        if ret == '': attempt += 1
+                        # ret = self._serial_port.readlines()
                         ret = self.read(read_lines)
                         logmsg = 'Send command: {}, request post: {}'.format(req, ret)
                         logger.info(logmsg)
                         print('Attempt: ', attempt, ', ret = ', ret, ', req=', req)
                         time.sleep(0.01)
                         if set_attempt:
-                            if attempt > set_attempt/0.01:
+                            if attempt > set_attempt / 0.01:
                                 logger.error('Fail, no answer from board')
                                 self._is_connected = False
                                 break
@@ -382,67 +352,61 @@ class Board(object):
                                 break
                     else:
                         self._success()
-                    #ret = self.read(read_lines)
+                    # ret = self.read(read_lines)
                     print('succes send command')
                 except:
                     print("False send command")
                     if hasattr(self, '_serial_port'):
                         self._fail()
         if callback is not None:
-            print(ret)
-            #callback(ret)
+            print(ret)  # callback(ret)
         return ret
-
+    
     def read(self, read_lines=False):
         if read_lines:
             return ''.join(self._serial_port.readlines())
         else:
             return ''.join(self._serial_port.readline().decode('utf-8'))
-
+    
     def _success(self):
         self._tries = 0
-
+    
     def _fail(self):
         if self._is_connected:
             logger.debug("Board fail")
             self._tries += 1
             if self._tries >= 3:
                 self._tries = 0
-                if self.unplug_callback is not None and \
-                   self.parent is not None and \
-                   not self.parent.unplugged:
+                if self.unplug_callback is not None and self.parent is not None and not self.parent.unplugged:
                     self.parent.unplugged = True
                     self.unplug_callback()
-
+    
     def _reset(self):
         self._serial_port.flushInput()
         self._serial_port.flushOutput()
         self._serial_port.write("\x18\r\n".encode('utf-8'))  # Ctrl-x
         self._serial_port.readline()
-
+    
     def get_serial_list(self):
         """Obtain list of serial devices"""
         baselist = []
         if system == 'Windows':
             import winreg
             try:
-                key = winreg.OpenKey(
-                    winreg.HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM")
+                key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "HARDWARE\\DEVICEMAP\\SERIALCOMM")
                 i = 0
                 while True:
                     try:
                         values = winreg.EnumValue(key, i)
                     except:
                         return baselist
-                    if 'USBSER' in values[0] or \
-                       'VCP' in values[0] or \
-                       '\Device\Serial' in values[0]:
+                    if 'USBSER' in values[0] or 'VCP' in values[0] or '\Device\Serial' in values[0]:
                         baselist.append(values[1])
                     i += 1
             except:
                 return baselist
         else:
-            for device in ['/dev/ttyACM*', '/dev/ttyUSB*', '/dev/tty.usb*', '/dev/tty.wchusb*',
-                           '/dev/cu.*', '/dev/rfcomm*']:
+            for device in ['/dev/ttyACM*', '/dev/ttyUSB*', '/dev/tty.usb*', '/dev/tty.wchusb*', '/dev/cu.*',
+                           '/dev/rfcomm*']:
                 baselist = baselist + glob.glob(device)
         return baselist
