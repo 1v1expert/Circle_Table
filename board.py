@@ -287,7 +287,7 @@ class Board(object):
             self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
             #self.send_command("G1X{0}".format(self._motor_position), nonblocking, callback)
     
-    def motor_move_exchange(self, step=0, rate=0, nonblocking=True, callback=True):
+    def motor_move_exchange(self, step=0, rate=0, nonblocking=False, callback=True):
         if self._is_connected:
             self.set_attempt = step/rate * 60
             if self.coordinate_absolute:
